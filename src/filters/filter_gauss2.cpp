@@ -1,3 +1,4 @@
+/*
 #error "Fix me"
 #include "blur.h"
 
@@ -90,3 +91,5 @@ void Blur::render() {
     ++m_frame;
     //mat.rotate(1);
 }
+*/
+
