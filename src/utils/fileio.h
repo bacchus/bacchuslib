@@ -106,4 +106,25 @@ inline std::string file_readbuff(const std::string& fname) {
     return "";
 }
 
+//TODO: posix, not tested
+//inline int file_size(const char* fname) {
+//    struct stat fileStat;
+//    stat(fname, &fileStat);
+//    return fileStat.st_size;
+//}
+
+//std::string readTextFile(const std::string& fn) {
+//    std::ifstream ifs(fn.c_str());
+//    std::ostringstream oss;
+//    if (ifs.is_open()) {
+//        while (ifs.good()) {
+//            std::string tmp;
+//            ifs >> tmp;
+//            oss << tmp << " ";
+//        }
+//    }
+//    std::cout << oss.str() << std::endl;
+//    return oss.str();
+//}
+
 } // namespace bacchus

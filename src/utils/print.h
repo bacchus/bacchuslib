@@ -19,4 +19,7 @@
 //    return os << std::endl;
 //}
 
+//#define BCC_PRINT(x) std::cout << std::setw(10) << std::left << #x ": "
+//    << std::setw(5) << std::right << std::boolalpha << (x) << std::endl
+
 //} // namespace bacchus

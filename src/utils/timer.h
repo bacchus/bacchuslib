@@ -114,4 +114,23 @@ private:
     float cur_fps = 0;
 };
 
+//TODO: generate_timed_filename not tested
+//inline const char* generate_timed_filename() {
+//    time_t rawtime;
+//    struct tm * timeinfo;
+//    char buf[10];
+//    time(&rawtime);
+//    timeinfo = localtime(&rawtime);
+//    strftime(buf, 10, "%I_%M.txt", timeinfo);
+//    return buf;
+//}
+
+//#include <sys/time.h>
+//double getTimeMsec() {
+//    timeval end;
+//    gettimeofday(&end, NULL);
+//    return (end.tv_sec - timeMark.tv_sec)*1000.0
+//         + (end.tv_usec - timeMark.tv_usec)/1000.0;
+//}
+
 } // namespace bacchus
