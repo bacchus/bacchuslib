@@ -36,9 +36,48 @@ public:
     void clear();
 protected:
     bool   load_rle_data(std::ifstream &in);
+
+    //TODO: not tested
+    //bool simple_read_tga_file(const char *file_name);
 private:
     Image& m_img;
 };
+
+//TODO: not tested
+// but uses bitsperpixel
+//bool tga_read_struct::simple_read_tga_file(const char *file_name) {
+//    std::fstream fs;
+//    fs.open(file_name.c_str(), std::ios::in|std::ios::binary);
+//    if (fs.is_open()) {
+//        tga_header header;
+//        fs.read((char*)&header, sizeof(tga_header));
+//        int size = header.width*header.height*header.bitsperpixel;
+//        if (m_img.dat8)
+//            delete[] m_img.dat8;
+//        m_img.dat8 = new unsigned char[size];
+//        fs.read(reinterpret_cast<char*>(m_img.dat8), size);
+
+//        if (header.bitsperpixel==24) {
+//            for (int i=0; i<size; i+=3) {
+//                unsigned char c = m_img.dat8[i];
+//                m_img.dat8[i] = m_img.dat8[i+2];
+//                m_img.dat8[i+2] = c;
+//            }
+//        } else if (header.bitsperpixel==32) {
+//            for (int i=0; i<size; i+=4) {
+//                unsigned char c = m_img.dat8[i];
+//                m_img.dat8[i] = m_img.dat8[i+2];
+//                m_img.dat8[i+2] = c;
+//            }
+//        }
+
+//        fs.close();
+
+//    } else {
+//        std::cerr << "can't open file " << file_name << "\n";
+//        return false;
+//    }
+//}
 
 class tga_write_struct {
 public:
@@ -51,7 +90,8 @@ private:
 };
 
 bool tga_read_struct::read_tga_file(const char *file_name) {
-    if (m_img.dat8) delete[] m_img.dat8;
+    if (m_img.dat8)
+        delete[] m_img.dat8;
     m_img.dat8 = NULL;
     std::ifstream in;
     in.open (file_name, std::ios::binary);
@@ -320,5 +360,7 @@ void write_tga_mirrored(const char *file_name, const Image &src) {
     tga_write_struct writer(src);
     writer.write_tga_file(file_name);
 }
+
+
 
 } // namespace bacchus
