@@ -1,0 +1,1273 @@
+
+     Creating a Default Thread
+Use pthread_create(3C) to add a new thread of control to the current process.
+
+attrs:
+- Process scope
+- Nondetached
+- A default stack and stack size
+- A priority of zero
+
+int pthread_create(pthread_t *restrict tid, const pthread_attr_t
+                   *restrict tattr, void*(*start_routine)(void *), void *restrict arg);
+#include <pthread.h>
+
+pthread_attr_t() tattr;
+pthread_t tid;
+extern void *start_routine(void *arg);
+void *arg;
+int ret;
+
+/* default behavior*/
+ret = pthread_create(&tid, NULL, start_routine, arg);
+
+/* initialized with default attributes */
+ret = pthread_attr_init(&tattr);
+/* default behavior specified*/
+ret = pthread_create(&tid, &tattr, start_routine, arg);
+
+(ret):
+0 // NOERROR
+EAGAIN // A system limit is exceeded, such as when too many threads have been created.
+EINVAL // The value of tattr is invalid.
+EPERM // The caller does not have appropriate permission to set the required scheduling parameters or scheduling policy
+
+
+     Waiting for Thread Termination
+The pthread_join() function blocks the calling thread until the specified thread terminates.
+
+int pthread_join(pthread_t tid, void **status);
+#include <pthread.h>
+
+pthread_t tid;
+int ret;
+void *status;
+
+/* waiting to join thread "tid" with status */
+ret = pthread_join(tid, &status);
+
+/* waiting to join thread "tid" without status */
+ret = pthread_join(tid, NULL);
+
+The specified thread must be in the current process and must not be detached
+
+If multiple threads wait for the same thread to terminate,
+all the threads wait until the target thread terminates.
+Then one waiting thread returns successfully.
+The other waiting threads fail with an error of ESRCH.
+
+After pthread_join() returns,
+any data storage associated with the terminated thread can be reclaimed by the application
+
+
+ESRCH // No thread could be found corresponding to the given thread ID.
+EDEADLK // A deadlock would exist,
+        // such as a thread waits for itself
+        // or thread A waits for thread B and thread B waits for thread A.
+EINVAL // The thread corresponding to the given thread ID is a detached thread.
+
+
+pthread_join() works only for target threads that are nondetached.
+When no reason exists to synchronize with the termination of a particular thread,
+then that thread should be detached.
+
+
+
+
+    Example 2–1 Simple Threads Program
+
+void mainline (...)
+{
+        struct phonebookentry *pbe;
+        pthread_attr_t tattr;
+        pthread_t helper;
+        void *status;
+
+        pthread_create(&helper, NULL, fetch, &pbe);
+
+            /* do something else for a while */
+
+        pthread_join(helper, &status);
+        /* it's now safe to use result */
+}
+
+void *fetch(struct phonebookentry *arg)
+{
+        struct phonebookentry *npbe;
+        /* fetch value from a database */
+
+        npbe = search (prog_name)
+            if (npbe != NULL)
+                *arg = *npbe;
+        pthread_exit(0);
+}
+
+struct phonebookentry {
+        char name[64];
+        char phonenumber[32];
+        char flags[16];
+}
+
+
+
+
+
+
+
+    Detaching a Thread
+pthread_detach(3C) is an alternative to pthread_join(3C)
+to reclaim storage for a thread that is created
+with a detachstate attribute set to PTHREAD_CREATE_JOINABLE.
+
+int pthread_detach(pthread_t tid);
+#include <pthread.h>
+
+pthread_t tid;
+int ret;
+
+/* detach thread tid */
+ret = pthread_detach(tid);
+
+EINVAL // tid is a detached thread.
+ESRCH // tid is not a valid, undetached thread in the current process.
+
+
+
+    Creating a Key for Thread-Specific Data
+Single-threaded C programs have two basic classes of data:
+local data and global data.
+For multithreaded C programs a third class, thread-specific data, is added.
+Thread-specific data is very much like global data, except that the data is private to a thread
+
+Thread-specific data (TSD) is maintained on a per-thread basis.
+TSD is the only way to define and refer to data that is private to a thread.
+Each thread-specific data item is associated with a key that is global to all threads in the process.
+By using the key, a thread can access a pointer ( void *) maintained per-thread
+
+int pthread_key_create(pthread_key_t *key,
+    void (*destructor) (void *));
+#include <pthread.h>
+
+pthread_key_t key;
+int ret;
+
+/* key create without destructor */
+ret = pthread_key_create(&key, NULL);
+
+/* key create with destructor */
+ret = pthread_key_create(&key, destructor);
+
+
+The key is global to all threads in the process.
+
+EAGAIN // The key name space is exhausted.
+ENOMEM // Insufficient virtual memory is available in this process to create a new key.
+
+
+    Deleting the Thread-Specific Data Key
+Use pthread_key_delete(3C) to destroy an existing thread-specific data key.
+Any memory associated with the key can be freed because the key has been invalidated.
+Reference to an invalid key returns an error.
+
+int pthread_key_delete(pthread_key_t key);
+#include <pthread.h>
+
+pthread_key_t key;
+int ret;
+
+/* key previously created */
+ret = pthread_key_delete(key);
+
+EINVAL // The key value is invalid.
+
+
+    Setting Thread-Specific Data
+Use pthread_setspecific(3C) to set the thread-specific binding to the specified thread-specific data key.
+
+int pthread_setspecific(pthread_key_t key, const void *value);
+#include <pthread.h>
+
+pthread_key_t key;
+void *value;
+int ret;
+
+/* key previously created */
+ret = pthread_setspecific(key, value);
+
+
+ENOMEM // Insufficient virtual memory is available.
+EINVAL // key is invalid.
+
+pthread_setspecific() does not free its storage when a new binding is set.
+The existing binding must be freed, otherwise a memory leak can occur.
+
+
+    Getting Thread-Specific Data
+Use pthread_getspecific(3C) to get the calling thread's binding for key,
+and store the binding in the location pointed to by value.
+
+void *pthread_getspecific(pthread_key_t key);
+#include <pthread.h>
+
+pthread_key_t key;
+void *value;
+
+/* key previously created */
+value = pthread_getspecific(key);
+
+
+    Global and Private Thread-Specific Data Example
+
+Example 2–2 shows an excerpt from a multithreaded program.
+This code is executed by any number of threads
+but the code has references to two global variables, errno and mywindow.
+These global values really should be references to items private to each thread.
+
+Example 2–2 Thread-Specific Data—Global but Private
+shows an excerpt from a multithreaded program.
+This code is executed by any number of threads,
+but the code has references to two global variables, errno and mywindow.
+These global values really should be references to items private to each thread
+
+body() {
+    ...
+    while (write(fd, buffer, size) == -1) {
+        if (errno != EINTR) {
+            fprintf(mywindow, "%s\n", strerror(errno));
+            exit(1);
+        }
+    }
+    ...
+}
+
+References to errno should get the system error code from the routine called by this thread,
+not by some other thread. Including the header file errno.h causes a reference to errno
+to be a reference to a thread-private instance of errno,
+so that references to errno by one thread refer to a different storage location than references to errno by other threads.
+
+The mywindow variable refers to a stdio stream that is connected to a window
+that is private to the referring thread.
+So, as with errno, references to mywindow by one thread should refer to a different storage location
+than references to mywindow by other threads. Ultimately, the reference is to a different window.
+The only difference here is that the system takes care of errno , but the programmer must handle references for mywindow .
+
+The next example shows how the references to mywindow work.
+The preprocessor converts references to mywindow into invocations of the _mywindow() procedure.
+
+This routine in turn invokes pthread_getspecific().
+pthread_getspecific() receives the mywindow_key global variable and win an output parameter
+that receives the identity of this thread's window.
+
+
+Example 2–3 Turning Global References Into Private References
+
+thread_key_t mywin_key;
+
+FILE* _mywindow(void) {
+    FILE* win;
+    win = pthread_getspecific(mywin_key);
+    return win;
+}
+#define mywindow _mywindow()
+
+void routine_uses_win(FILE* win) {
+    ...
+}
+
+void thread_start(...) {
+    ...
+    make_mywin();
+    ...
+    routine_uses_win(mywindow)
+    ...
+}
+
+The mywin_key variable identifies a class of variables for which each thread has its own private copy.
+These variables are thread-specific data. Each thread calls make_mywin() to initialize its window
+and to arrange for its instance of mywindow to refer to the thread-specific data.
+
+Once this routine is called, the thread can safely refer to mywindow and, after _mywindow(),
+the thread gets the reference to its private window.
+References to mywindow behave as if direct references were made to data private to the thread.
+
+
+Example 2–4 Initializing the Thread-Specific Data
+
+void make_mywindow(void) {
+    FILE** win;
+    static pthread_once_t mykeycreated = PTHREAD_ONCE_INIT;
+
+    pthread_once(&mykeycreated, mykeycreate);
+
+    win = malloc(sizeof(*win));
+    create_window(win, ...);
+
+    pthread_setspecific(mywindow_key, win);
+}
+
+void mykeycreate(void) {
+    pthread_key_create(&mywindow_key, free_key);
+}
+
+void free_key(void* win) {
+    free(win);
+}
+
+
+First, get a unique value for the key, mywin_key.
+This key is used to identify the thread-specific class of data.
+The first thread to call make_mywin() eventually calls pthread_key_create() ,
+which assigns to its first argument a unique key.
+The second argument is a destructor function that is used to deallocate a thread's instance
+of this thread-specific data item once the thread terminates.
+
+The next step is to allocate the storage for the caller's instance
+of this thread-specific data item. Having allocated the storage,
+calling create_window() sets up a window for the thread.
+win points to the storage allocated for the window.
+Finally, a call is made to pthread_setspecific(), which associates win with the key.
+
+Subsequently, whenever the thread calls pthread_getspecific() to pass the global key,
+the thread gets the value that is associated with this key by this thread in an earlier call to pthread_setspecific() .
+
+When a thread terminates, calls are made to the destructor functions that were set up in pthread_key_create().
+Each destructor function is called only if the terminating thread established a value for the key by calling pthread_setspecific()
+
+
+
+    Getting the Thread Identifier
+Use pthread_self(3C) to get the thread identifier of the calling thread.
+
+pthread_t  pthread_self(void);
+#include <pthread.h>
+
+pthread_t tid;
+tid = pthread_self();
+
+
+    Comparing Thread IDs
+Use pthread_equal(3C) to compare the thread identification numbers of two threads.
+
+pthread_equal Syntax
+int  pthread_equal(pthread_t tid1, pthread_t tid2);
+#include <pthread.h>
+
+pthread_t tid1, tid2;
+int ret = pthread_equal(tid1, tid2);
+
+pthread_equal() returns a nonzero value when tid1 and tid2 are equal, otherwise, 0 is returned.
+When either tid1 or tid2 is an invalid thread identification number, the result is unpredictable
+
+
+
+    Calling an Initialization Routine for a Thread
+Use pthread_once(3C) in a threaded process to call an initialization routine the first time pthread_once is called.
+Subsequent calls to pthread_once() from any thread in the process have no effect
+
+
+int  pthread_once(pthread_once_t *once_control, void (*init_routine)(void));
+#include <pthread.h>
+
+pthread_once_t once_control = PTHREAD_ONCE_INIT;
+int ret = pthread_once(&once_control, init_routine);
+
+
+EINVAL // once_control or init_routine is NULL.
+
+The once_control parameter determines whether the associated initialization routine has been called.
+
+
+
+    Yielding Thread Execution
+
+Use sched_yield(3RT) to cause the current thread to yield its execution
+in favor of another thread with the same or greater priority.
+If no such threads are ready to run, the calling thread continues to run.
+The sched_yield() function is not part of the Pthread API,
+but is a function in the Realtime Library Functions.
+You must include <sched.h> to use sched_yield()
+
+
+int  sched_yield(void);
+#include <sched.h>
+int ret = sched_yield();
+
+sched_yield() returns zero after completing successfully.
+Otherwise, -1 is returned and errno is set to indicate the error condition
+
+
+
+
+    Setting the Thread Policy and Scheduling Parameters
+Use pthread_setschedparam(3C) to modify the scheduling policy and scheduling parameters of an individual thread.
+
+
+int pthread_setschedparam(pthread_t tid, int  policy, const struct sched_param *param);
+#include <pthread.h>
+
+pthread_t tid;
+int ret;
+struct sched_param param;
+int priority;
+
+/* sched_priority will be the priority of the thread */
+sched_param.sched_priority = priority;
+policy = SCHED_OTHER;
+
+/* scheduling parameters of target thread */
+ret = pthread_setschedparam(tid, policy, &param);
+
+Supported policies are SCHED_FIFO, SCHED_RR, and SCHED_OTHER.
+
+
+EINVAL // The value of the attribute being set is not valid.
+EPERM // The caller does not have the appropriate permission to set either the scheduling parameters or the scheduling policy of the specified thread.
+ESRCH // The value specified by tid does not refer to an existing thread.
+
+
+
+
+Getting the Thread Policy and Scheduling Parameters
+pthread_getschedparam(3C) gets the scheduling policy and scheduling parameters of an individual thread.
+
+int  pthread_getschedparam(pthread_t tid, int *restrict policy, struct sched_param *restrict param);
+#include <pthread.h>
+
+pthread_t tid;
+sched_param param;
+int priority;
+int policy;
+int ret;
+
+/* scheduling parameters of target thread */
+ret = pthread_getschedparam (tid, &policy, &param);
+
+/* sched_priority contains the priority of the thread */
+priority = param.sched_priority;
+
+
+
+ESRCH // The value specified by tid does not refer to an existing thread.
+
+
+
+    Setting the Thread Priority
+
+pthread_setschedprio(3C) sets the scheduling priority for the specified thread.
+
+
+int pthread_setschedprio(pthread_t tid, int prio);
+#include <pthread.h>
+
+pthread_t tid;
+int prio;
+int ret;
+
+
+
+EINVAL // The value of prio is invalid for the scheduling policy of the specified thread.
+ENOTSUP // An attempt was made to set the priority to an unsupported value.
+EPERM // The caller does not have the appropriate permission to set the scheduling priority of the specified thread.
+ESRCH // The value specified by tid does not refer to an existing thread.
+
+
+
+    Sending a Signal to a Thread
+Use pthread_kill(3C) to send a signal to a thread.
+
+int  pthread_kill(pthread_t tid, int sig);
+#include <pthread.h>
+#include <signal.h>
+
+int sig;
+pthread_t tid;
+int ret;
+
+ret = pthread_kill(tid, sig);
+
+
+pthread_kill() sends the signal sig to the thread specified by tid.
+tid must be a thread within the same process as the calling thread.
+Thesig argument must be from the list that is given in signal.h(3HEAD).
+
+When sig is zero, error checking is performed but no signal is actually sent.
+This error checking can be used to check the validity of tid
+
+
+EINVAL // sig is not a valid signal number.
+ESRCH // tid cannot be found in the current process.
+
+
+
+    Accessing the Signal Mask of the Calling Thread
+Use pthread_sigmask(3C) to change or examine the signal mask of the calling thread.
+
+int pthread_sigmask(int how, const sigset_t *new, sigset_t *old);
+#include <pthread.h>
+#include <signal.h>
+
+int ret;
+sigset_t old, new;
+
+ret = pthread_sigmask(SIG_SETMASK, &new, &old); /* set new mask */
+ret = pthread_sigmask(SIG_BLOCK, &new, &old); /* blocking mask */
+ret = pthread_sigmask(SIG_UNBLOCK, &new, &old); /* unblocking */
+
+
+how determines how the signal set is changed. how can have one of the following values:
+ - SIG_BLOCK. Add new to the current signal mask, where new indicates the set of signals to block.
+ - SIG_UNBLOCK. Delete new from the current signal mask, where new indicates the set of signals to unblock.
+ - SIG_SETMASK . Replace the current signal mask with new, where new indicates the new signal mask.
+
+When the value of new is NULL, the value of how is not significant.
+The signal mask of the thread is unchanged.
+To inquire about currently blocked signals, assign a NULL value to the new argument.
+The old variable points to the space where the previous signal mask is stored, unless old is NULL.
+
+EINVAL // The value of how is not defined and old is NULL.
+
+
+
+
+    Forking Safely
+See the discussion about pthread_atfork(3C) in Solution: pthread_atfork.
+
+int pthread_atfork(void (*prepare) (void), void (*parent) (void), void (*child) (void) );
+
+ENOMEM // Insufficient table space exists to record the fork handler addresses.
+
+
+
+    Terminating a Thread
+Use pthread_exit(3C) to terminate a thread.
+
+void	 pthread_exit(void *status);
+#include <pthread.h>
+void *status;
+pthread_exit(status); /* exit with status */
+
+
+The pthread_exit() function terminates the calling thread.
+All thread-specific data bindings are released.
+If the calling thread is not detached,
+then the thread's ID and the exit status specified by status are retained
+until your application calls pthread_join() to wait for the thread.
+Otherwise, status is ignored. The thread's ID can be reclaimed immediately.
+
+
+Finishing Up
+A thread can terminate its execution in the following ways:
+ - By returning from its first (outermost) procedure, the threads start routine. See pthread_create.
+ - By calling pthread_exit(), supplying an exit status.
+ - By termination with POSIX cancel functions. See pthread_cancel() .
+
+The default behavior of a thread is to linger
+until some other thread has acknowledged its demise by “joining” with the lingering thread.
+This behavior is the same as the default pthread_create() attribute that is nondetached, see pthread_detach.
+The result of the join is that the joining thread picks up the exit status of the terminated thread and the terminated thread vanishes.
+
+An important special case arises when the initial thread, calling main(),
+returns from calling main() or calls exit().
+This action causes the entire process to be terminated,
+along with all its threads.
+So, take care to ensure that the initial thread does not return from main() prematurely.
+
+Note that when the main thread merely calls pthread_exit,
+the main thread terminates itself only.
+The other threads in the process, as well as the process, continue to exist.
+The process terminates when all threads terminate.
+
+
+    Cancellation Points
+Be careful to cancel a thread only when cancellation is safe.
+The pthreads standard specifies several cancellation points, including:
+ - Programmatically, establish a thread cancellation point through a pthread_testcancel call.
+ - Threads waiting for the occurrence of a particular condition in pthread_cond_wait or pthread_cond_timedwait(3C).
+ - Threads blocked on sigwait(2).
+ - Some standard library calls. In general, these calls include functions in which threads can block. See the cancellation(5) man page for a list.
+
+Cancellation is enabled by default.
+At times, you might want an application to disable cancellation.
+Disabled cancellation has the result of deferring all cancellation requests until cancellation requests are enabled again.
+See pthread_setcancelstate Syntax for information about disabling cancellation.
+
+
+    Placing Cancellation Points
+Dangers exist in performing cancellations.
+Most deal with properly restoring invariants and freeing shared resources.
+A thread that is cancelled without care might leave a mutex in a locked state, leading to a deadlock.
+Or a cancelled thread might leave a region of allocated memory with no way to identify the memory and therefore unable to free the memory.
+
+The standard C library specifies a cancellation interface that permits or forbids cancellation programmatically.
+The library defines cancellation points that are the set of points at which cancellation can occur.
+The library also allows the scope of cancellation handlers to be defined so that the handlers are sure to operate when and where intended.
+The cancellation handlers provide clean up services to restore resources and state to a condition that is consistent with the point of origin.
+
+Placement of cancellation points and the effects of cancellation handlers must be based on an understanding of the application.
+A mutex is explicitly not a cancellation point and should be held only for the minimal essential time.
+
+Limit regions of asynchronous cancellation to sequences with no external dependencies
+that could result in dangling resources or unresolved state conditions.
+Take care to restore cancellation state when returning from some alternate, nested cancellation state.
+The interface provides features to facilitate restoration:
+ - pthread_setcancelstate(3C) preserves the current cancel state in a referenced variable,
+ - pthread_setcanceltype(3C) preserves the current cancel type in the same way.
+
+Cancellations can occur under three different circumstances:
+ - Asynchronously
+ - At various points in the execution sequence as defined by the standard
+ - At a call to pthread_testcancel()
+
+By default, cancellation can occur only at well-defined points as defined by the POSIX standard.
+
+In all cases, take care that resources and state are restored to a condition consistent with the point of origin.
+
+
+
+    Cancelling a Thread
+Use pthread_cancel(3C) to cancel a thread.
+
+int pthread_cancel(pthread_t thread);
+#include <pthread.h>
+
+pthread_t thread;
+int ret;
+ret = pthread_cancel(thread);
+
+How the cancellation request is treated depends on the state of the target thread.
+Two functions, pthread_setcancelstate(3C) and pthread_setcanceltype(3C) , determine that state
+
+ESRCH // No thread could be found corresponding to that specified by the given thread ID.
+
+
+    Enabling or Disabling Cancellation
+Use pthread_setcancelstate(3C) to enable or disable thread cancellation.
+When a thread is created, thread cancellation is enabled by default.
+
+
+int pthread_setcancelstate(int state, int *oldstate);
+#include <pthread.h>
+
+int oldstate;
+int ret;
+
+/* enabled */
+ret = pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, &oldstate);
+
+/* disabled */
+ret = pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &oldstate);
+
+
+EINVAL // The state is not PTHREAD_CANCEL_ENABLE or PTHREAD_CANCEL_DISABLE.
+
+
+
+
+    Setting Cancellation Type
+Use pthread_setcanceltype(3C) to set the cancellation type to either deferred or asynchronous mode.
+
+
+int pthread_setcanceltype(int type, int *oldtype);
+#include <pthread.h>
+
+int oldtype;
+int ret;
+
+/* deferred mode */
+ret = pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, &oldtype);
+
+/* async mode*/
+ret = pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, &oldtype);
+
+
+When a thread is created, the cancellation type is set to deferred mode by default.
+ - In deferred mode, the thread can be cancelled only at cancellation points.
+ - In asynchronous mode, a thread can be cancelled at any point during its execution.
+The use of asynchronous mode is discouraged.
+
+EINVAL // The type is not PTHREAD_CANCEL_DEFERRED or PTHREAD_CANCEL_ASYNCHRONOUS.
+
+
+
+    Creating a Cancellation Point
+Use pthread_testcancel(3C) to establish a cancellation point for a thread.
+
+void pthread_testcancel(void);
+#include <pthread.h>
+
+pthread_testcancel();
+
+
+The pthread_testcancel() function is effective when thread cancellation is enabled and in deferred mode.
+pthread_testcancel() has no effect if called while cancellation is disabled.
+
+Be careful to insert pthread_testcancel() only in sequences where thread cancellation is safe.
+In addition to programmatically establishing cancellation points through the pthread_testcancel() call,
+the pthreads standard specifies several cancellation points.
+pthread_testcancel() has no return value.
+
+
+    Pushing a Handler Onto the Stack
+
+Use cleanup handlers to restore conditions to a state that is consistent with that state at the point of origin.
+This consistent state includes cleaning up allocated resources and restoring invariants.
+Use the pthread_cleanup_push(3C) and pthread_cleanup_pop(3C) functions to manage the handlers.
+
+Cleanup handlers are pushed and popped in the same lexical scope of a program.
+The push and pop should always match. Otherwise, compiler errors are generated.
+
+
+Use pthread_cleanup_push(3C) to push a cleanup handler onto a cleanup stack (LIFO).
+
+void pthread_cleanup_push(void(*routine)(void *), void *args);
+#include <pthread.h>
+
+/* push the handler "routine" on cleanup stack */
+pthread_cleanup_push(routine, arg);
+
+pthread_cleanup_push() has no return value.
+
+
+    Pulling a Handler Off the Stack
+Use pthread_cleanup_pop(3C) to pull the cleanup handler off the cleanup stack.
+
+void pthread_cleanup_pop(int execute);
+#include <pthread.h>
+
+/* pop the "func" out of cleanup stack and execute "func" */
+pthread_cleanup_pop(1);
+
+/* pop the "func" and DONT execute "func" */
+pthread_cleanup_pop(0);
+
+A nonzero argument in the pop function removes the handler from the stack and executes the handler.
+An argument of zero pops the handler without executing the handler.
+
+pthread_cleanup_pop() is effectively called with a nonzero argument
+when a thread either explicitly or implicitly calls pthread_exit()
+or when the thread accepts a cancel request.
+
+pthread_cleanup_pop() has no return values.
+
+
+
+
+
+
+
+
+
+            Attribute Object
+
+
+
+    Initializing Attributes
+Use pthread_attr_init(3C) to initialize object attributes to their default values. The storage is allocated by the thread system during execution.
+
+int pthread_attr_init(pthread_attr_t *tattr);
+#include <pthread.h>
+
+pthread_attr_t tattr;
+int ret;
+
+/* initialize an attribute to the default value */
+ret = pthread_attr_init(&tattr);
+
+ENOMEM // Returned when not enough memory is allocated to initialize the thread attributes object.
+
+Default Attribute Values for tattr
+Attribute       Value                       Result
+
+scope           PTHREAD_SCOPE_PROCESS       New thread contends with other threads in the process.
+detachstate     PTHREAD_CREATE_JOINABLE     Completion status and thread ID are preserved after the thread exits.
+stackaddr       NULL                        New thread has system-allocated stack address.
+stacksize       0                           New thread has system-defined stack size.
+priority        0                           New thread has priority 0.
+inheritsched    PTHREAD_EXPLICIT_SCHED      New thread does not inherit parent thread scheduling priority.
+schedpolicy     SCHED_OTHER                 New thread uses the traditional Solaris time-sharing (TS) scheduling class.
+guardsize       PAGESIZE                    Stack overflow protection.
+
+
+    Destroying Attributes
+Use pthread_attr_destroy(3C) to remove the storage that was allocated during initialization. The attribute object becomes invalid.
+
+int pthread_attr_destroy(pthread_attr_t *tattr);
+#include <pthread.h>
+
+pthread_attr_t tattr;
+int ret;
+
+/* destroy an attribute */
+ret = pthread_attr_destroy(&tattr);
+
+EINVAL // Indicates that the value of tattr was not valid.
+
+
+
+    Setting Detach State
+When a thread is created detached (PTHREAD_CREATE_DETACHED),
+its thread ID and other resources can be reused as soon as the thread exits.
+Use pthread_attr_setdetachstate(3C) when the calling thread does not want to wait for the thread to exit.
+
+int pthread_attr_setdetachstate(pthread_attr_t *tattr,int detachstate);
+#include <pthread.h>
+pthread_attr_t tattr;
+int ret;
+/* set the thread detach state */
+ret = pthread_attr_setdetachstate(&tattr,PTHREAD_CREATE_DETACHED);
+
+When a thread is created nondetached with PTHREAD_CREATE_JOINABLE,
+the assumption is that your application will wait for the thread to complete.
+That is, the program will execute a pthread_join() on the thread.
+
+
+Example 3–1 Creating a Detached Thread
+
+#include <pthread.h>
+
+pthread_attr_t tattr;
+pthread_t tid;
+void *start_routine;
+void arg
+int ret;
+
+/* initialized with default attributes */
+ret = pthread_attr_init (&tattr);
+ret = pthread_attr_setdetachstate(&tattr,PTHREAD_CREATE_DETACHED);
+ret = pthread_create(&tid, &tattr, start_routine, arg);
+
+EINVAL // Indicates that the value of detachstate or tattr was not valid.
+
+
+
+    Getting the Detach State
+Use pthread_attr_getdetachstate(3C) to retrieve the thread create state, which can be either detached or joined.
+
+int pthread_attr_getdetachstate(const pthread_attr_t *tattr, int *detachstate;
+#include <pthread.h>
+pthread_attr_t tattr;
+int detachstate;
+int ret;
+/* get detachstate of thread */
+ret = pthread_attr_getdetachstate (&tattr, &detachstate);
+
+EINVAL // Indicates that the value of detachstate is NULL or tattr is invalid.
+
+
+
+    Setting the Stack Guard Size
+pthread_attr_setguardsize(3C) sets the guardsize of the attr object.
+
+#include <pthread.h>
+int pthread_attr_setguardsize(pthread_attr_t *attr, size_t guardsize);
+
+
+The guardsize attribute is provided to the application for two reasons:
+
+Overflow protection can potentially result in wasted system resources.
+When your application creates a large number of threads,
+and you know that the threads will never overflow their stack,
+you can turn off guard areas.
+By turning off guard areas, you can conserve system resources.
+
+When threads allocate large data structures on stack,
+a large guard area might be needed to detect stack overflow.
+
+The guardsize argument provides protection against overflow of the stack pointer.
+If a thread's stack is created with guard protection,
+the implementation allocates extra memory at the overflow end of the stack.
+This extra memory acts as a buffer against stack overflow of the stack pointer.
+If an application overflows into this buffer an error results,
+possibly in a SIGSEGV signal being delivered to the thread.
+
+If guardsize is zero, a guard area is not provided for threads that are created with attr.
+If guardsize is greater than zero, a guard area of at least size guardsize bytes is provided for each thread created with attr.
+By default, a thread has an implementation-defined, nonzero guard area.
+
+A conforming implementation is permitted to round up the value contained in guardsize
+to a multiple of the configurable system variable PAGESIZE .
+See PAGESIZE in sys/mman.h.
+If an implementation rounds up the value of guardsize to a multiple of PAGESIZE,
+a call to pthread_attr_getguardsize() that specifies attr stores,
+in guardsize, the guard size specified in the previous call to pthread_attr_setguardsize().
+
+EINVAL // The argument attr is invalid, the argument guardsize is invalid, or the argument guardsize contains an invalid value.
+
+
+    Getting the Stack Guard Size
+pthread_attr_getguardsize(3C) gets the guardsize of the attr object.
+
+#include <pthread.h>
+
+int pthread_attr_getguardsize(const pthread_attr_t *restrict attr, size_t  *restrict guardsize);
+
+EINVAL // The argument attr is invalid, the argument guardsize is invalid, or the argument guardsize contains an invalid value.
+
+
+    Setting the Scope
+Use pthread_attr_setscope(3C) to establish the contention scope of a thread,
+ - With PTHREAD_SCOPE_SYSTEM, this thread contends with all threads in the system.
+ - With PTHREAD_SCOPE_PROCESS , this thread contends with other threads in the process.
+
+
+
+int pthread_attr_setscope(pthread_attr_t *tattr,int scope);
+#include <pthread.h>
+
+pthread_attr_t tattr;
+int ret;
+
+/* bound thread */
+ret = pthread_attr_setscope(&tattr, PTHREAD_SCOPE_SYSTEM);
+
+/* unbound thread */
+ret = pthread_attr_setscope(&tattr, PTHREAD_SCOPE_PROCESS);
+This example uses three function calls:
+ - a call to initialize the attributes,
+ - a call to set any variations from the default attributes,
+ - a call to create the pthreads.
+
+#include <pthread.h>
+
+pthread_attr_t attr;
+pthread_t tid;
+void *start_routine(void *);
+void *arg;
+int ret;
+
+/* initialized with default attributes */
+ret = pthread_attr_init (&tattr);
+ret =  pthread_attr_setscope(&tattr, PTHREAD_SCOPE_SYSTEM);
+ret = pthread_create (&tid, &tattr, start_routine, arg);
+
+EINVAL // An attempt was made to set tattr to a value that is not valid.
+
+
+
+
+
+    Getting the Scope
+Use pthread_attr_getscope(3C) to retrieve the thread scope.
+
+int pthread_attr_getscope(pthread_attr_t *restrict tattr, int *restrict scope);
+#include <pthread.h>
+
+pthread_attr_t tattr;
+int scope;
+int ret;
+
+/* get scope of thread */
+ret = pthread_attr_getscope(&tattr, &scope);
+
+
+EINVAL // The value of scope is NULL or tattr is invalid.
+
+
+
+    Setting the Thread Concurrency Level
+pthread_setconcurrency(3C) is provided for standards compliance.
+pthread_setconcurrency() is used by an application to inform the system of the application's desired concurrency level
+
+
+#include <pthread.h>
+
+int pthread_setconcurrency(int new_level);
+
+EINVAL // The value specified by new_level is negative.
+EAGAIN // The value specified by new_level would cause a system resource to be exceeded.
+
+
+
+    Getting the Thread Concurrency Level
+pthread_getconcurrency(3C) returns the value set by a previous call to pthread_setconcurrency().
+
+#include <pthread.h>
+
+int pthread_getconcurrency(void);
+
+pthread_getconcurrency() always returns the concurrency level set by a previous call to pthread_setconcurrency() .
+If pthread_setconcurrency() has never been called, pthread_getconcurrency() returns zero.
+
+
+    Setting the Scheduling Policy
+Use pthread_attr_setschedpolicy(3C) to set the scheduling policy.
+
+int pthread_attr_setschedpolicy(pthread_attr_t *tattr, int policy);
+#include <pthread.h>
+pthread_attr_t tattr;
+int policy;
+int ret;
+
+/* set the scheduling policy to SCHED_OTHER */
+ret = pthread_attr_setschedpolicy(&tattr, SCHED_OTHER);
+
+SCHED_FIFO - A First-In-First-Out thread runs in the real-time (RT) scheduling class
+    and require the calling process to be privileged.
+    Such a thread, if not preempted by a higher priority thread, executes until it yields or blocks.
+SCHED_RR - Round-Robin threads whose contention scope is system (PTHREAD_SCOPE_SYSTEM)
+    are in real-time (RT) scheduling class if the calling process has an effective user id of 0.
+    These threads, if not preempted by a higher priority thread,
+    and if the threads do not yield or block,
+    will execute for the system-determined time period.
+    Use SCHED_RR for threads that have a contention scope of process (PTHREAD_SCOPE_PROCESS) is based on the TS scheduling class.
+    Additionally, the calling process for these threads does not have an effective userid of 0.
+
+SCHED_OTHER - (an implementation-defined method)
+
+
+A Round-Robin thread runs in the real-time (RT) scheduling class and requires the calling process to be privileged.
+If a round robin thread is not preempted by a higher priority thread, and does not yield or block, it will execute for a system-determined time period.
+The thread is then forced to yield to another real time thread of equal priority.
+
+SCHED_FIFO and SCHED_RR are optional in the POSIX standard, and are supported for real-time threads only.
+
+
+EINVAL // An attempt was made to set tattr to a value that is not valid.
+ENOTSUP // An attempt was made to set the attribute to an unsupported value.
+
+
+    Getting the Scheduling Policy
+Use pthread_attr_getschedpolicy(3C) to retrieve the scheduling policy.
+
+int pthread_attr_getschedpolicy(pthread_attr_t *restrict tattr, int *restrict policy);
+#include <pthread.h>
+pthread_attr_t tattr;
+int policy;
+int ret;
+
+/* get scheduling policy of thread */
+ret = pthread_attr_getschedpolicy (&tattr, &policy);
+
+EINVAL // The parameter policy is NULL or tattr is invalid.
+
+
+    Setting the Inherited Scheduling Policy
+Use pthread_attr_setinheritsched(3C) to set the inherited scheduling policy.
+
+
+int pthread_attr_setinheritsched(pthread_attr_t *tattr, int inheritsched);
+#include <pthread.h>
+pthread_attr_t tattr;
+int inheritsched;
+int ret;
+
+/* use  creating thread's scheduling policy and priority*/
+ret = pthread_attr_setinheritsched(&tattr, PTHREAD_INHERIT_SCHED);
+
+An inheritsched value of PTHREAD_INHERIT_SCHED means that the scheduling policy
+and priority of the creating thread are to be used for the created thread.
+The scheduling policy and priority in the attribute structure are to be ignored.
+An inheritsched value of PTHREAD_EXPLICIT_SCHED means that the scheduling policy
+and priority from the attribute structure are to be used for the created thread.
+The caller must have sufficient privilege for pthread_create() to succeed in this case.
+
+
+EINVAL // An attempt was made to set tattr to a value that is not valid.
+
+
+    Getting the Inherited Scheduling Policy
+pthread_attr_getinheritsched(3C) returns the inheritsched attribute contained in the attribute structure.
+
+
+int pthread_attr_getinheritsched(pthread_attr_t *restrict tattr
+       int *restrict inheritsched);
+#include <pthread.h>
+pthread_attr_t tattr;
+int inheritsched;
+int ret;
+
+ret = pthread_attr_getinheritsched (&tattr, &inheritsched);
+
+
+EINVAL // The parameter inherit is NULL or tattr is invalid.
+
+
+
+
+
+    Setting the Scheduling Parameters
+pthread_attr_setschedparam(3C) sets the scheduling parameters.
+
+int pthread_attr_setschedparam(pthread_attr_t *restrict tattr, const struct sched_param *restrict param);
+#include <pthread.h>
+pthread_attr_t tattr;
+int ret;
+int newprio;
+sched_param param;
+newprio = 30;
+/* set the priority; others are unchanged */
+param.sched_priority = newprio;
+/* set the new scheduling param */
+ret = pthread_attr_setschedparam (&tattr, &param);
+
+Scheduling parameters are defined in the param structure. Only the priority parameter is supported.
+
+
+EINVAL // The value of param is NULL or tattr is invalid.
+
+You can manage pthreads priority in either of two ways:
+ - You can set the priority attribute before creating a child thread
+ - You can change the priority of the parent thread and then change the priority back
+
+
+
+    Getting the Scheduling Parameters
+pthread_attr_getschedparam(3C) returns the scheduling parameters defined by pthread_attr_setschedparam().
+
+
+int pthread_attr_getschedparam(pthread_attr_t *restrict tattr, const struct sched_param *restrict param);
+#include <pthread.h>
+pthread_attr_t attr;
+struct sched_param param;
+int ret;
+/* get the existing scheduling param */
+ret = pthread_attr_getschedparam (&tattr, &param);
+
+
+
+
+
+    Creating a Thread With a Specified Priority
+You can set the priority attribute before creating the thread.
+The child thread is created with the new priority that is specified in the sched_param structure.
+This structure also contains other scheduling information.
+
+    Example of Creating a Prioritized Thread
+Example 3–2 shows an example of creating a child thread with a priority that is different from its parent's priority.
+
+#include <pthread.h>
+#include <sched.h>
+
+pthread_attr_t tattr;
+pthread_t tid;
+int ret;
+int newprio = 20;
+sched_param param;
+
+/* initialized with default attributes */
+ret = pthread_attr_init (&tattr);
+
+/* safe to get existing scheduling param */
+ret = pthread_attr_getschedparam (&tattr, &param);
+
+/* set the priority; others are unchanged */
+param.sched_priority = newprio;
+
+/* setting the new scheduling param */
+ret = pthread_attr_setschedparam (&tattr, &param);
+
+/* specify explicit scheduling */
+ret = pthread_attr_setinheritsched (&tattr, PTHREAD_EXPLICIT_SCHED);
+
+/* with new priority specified */
+ret = pthread_create (&tid, &tattr, func, arg);
+
+EINVAL // The value of param is NULL or tattr is invalid.
+
+
+
+
+
+    Setting the Stack Size
+pthread_attr_setstacksize(3C) sets the thread stack size.
+
+int pthread_attr_setstacksize(pthread_attr_t *tattr, size_t size);
+#include <pthread.h>
+#include <limits.h>
+
+pthread_attr_t tattr;
+pthread_t tid;
+int ret;
+
+size_t size = PTHREAD_STACK_MIN + 0x4000;
+
+/* initialized with default attributes */
+ret = pthread_attr_init(&tattr);
+/* setting the size of the stack also */
+ret = pthread_attr_setstacksize(&tattr, size);
+/* only size specified in tattr*/
+ret = pthread_create(&tid, &tattr, start_routine, arg);
+
+
+EINVAL // The value of size is less than PTHREAD_STACK_MIN, or exceeds a system-imposed limit, or tattr is not valid.
+
+
+
+    Getting the Stack Size
+pthread_attr_getstacksize(3C) returns the stack size set by pthread_attr_setstacksize().
+
+int pthread_attr_getstacksize(pthread_attr_t *restrict tattr, size_t *restrict size);
+#include <pthread.h>
+pthread_attr_t tattr;
+size_t size;
+int ret;
+/* getting the stack size */
+ret = pthread_attr_getstacksize(&tattr, &size);
+
+EINVAL // tattr or size is not valid.
+
+
+    Setting the Stack Address and Size
+pthread_attr_setstack(3C) sets the thread stack address and size.
+
+int pthread_attr_setstack(pthread_attr_t *tattr,void *stackaddr, size_t stacksize);
+#include <pthread.h>
+#include <limits.h>
+pthread_attr_t tattr;
+void *base;
+size_t size;
+int ret;
+base = (void *) malloc(PTHREAD_STACK_MIN + 0x4000);
+/* setting a new address and size */
+ret = pthread_attr_setstack(&tattr, base, PTHREAD_STACK_MIN + 0x4000);
+
+
+
+EINVAL // The value of base or tattr is incorrect. The value of stacksize is less than PTHREAD_STACK_MIN.
+
+The following example shows how to create a thread with a custom stack address and size.
+
+#include <pthread.h>
+
+pthread_attr_t tattr;
+pthread_t tid;
+int ret;
+void *stackbase;
+size_t size;
+
+/* initialized with default attributes */
+ret = pthread_attr_init(&tattr);
+
+/* setting the base address and size of the stack */
+ret = pthread_attr_setstack(&tattr, stackbase, size);
+
+/* address and size specified */
+ret = pthread_create(&tid, &tattr, func, arg);
+
+    Getting the Stack Address and Size
+pthread_attr_getstack(3C) returns the thread stack address and size set by pthread_attr_setstack().
+
+int pthread_attr_getstack(pthread_attr_t *restrict tattr, void **restrict stackaddr, size_t *restrict stacksize);
+#include <pthread.h>
+
+pthread_attr_t tattr;
+void *base;
+size_t size;
+int ret;
+
+/* getting a stack address and size */
+ret = pthread_attr_getstack (&tattr, &base, &size)
+
+EINVAL // The value of tattr is incorrect.
+
+
+
+
+
+
+
+
+
+
+            Programming with Synchronization Objects
+
