@@ -1,11 +1,8 @@
 varying vec4 pos;
-uniform vec2 size;
-uniform vec2 mouse;
-uniform float time;
 
-vec2 iResolution = size;
-vec2 iMouse = mouse;
-float iGlobalTime = time;
+uniform vec2 iResolution;
+uniform vec2 iMouse;
+uniform float iGlobalTime;
 
 // Created by inigo quilez - iq/2013
 // License Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
@@ -316,5 +313,4 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 
 void main() {
     mainImage(gl_FragColor, iResolution.xy*pos.xy);
-    //gl_FragColor = texture2D(img, tex);
 }

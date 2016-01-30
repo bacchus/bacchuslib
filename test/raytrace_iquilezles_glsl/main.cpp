@@ -17,6 +17,8 @@ using namespace bacchus;
 //Shader Inputs
 //uniform vec3      iResolution;           // viewport resolution (in pixels)
 //uniform float     iGlobalTime;           // shader playback time (in seconds)
+//uniform float     iTimeDelta;            // render time (in seconds)
+//uniform int       iFrame;                // shader playback frame
 //uniform float     iChannelTime[4];       // channel playback time (in seconds)
 //uniform vec3      iChannelResolution[4]; // channel resolution (in pixels)
 //uniform vec4      iMouse;                // mouse pixel coords. xy: current (if MLB down), zw: click
@@ -32,9 +34,9 @@ public:
         m_time.x = 0.f;
         m_mouse.x = 10;
         m_mouse.y = 10;
-        addParameter("size", &m_size);
-        addParameter("time", &m_time);
-        addParameter("mouse", &m_mouse);
+        addParameter("iResolution", &m_size);
+        addParameter("iGlobalTime", &m_time);
+        addParameter("iMouse", &m_mouse);
     }
 
     void setMouse(const vec2f& mouse) {
@@ -76,8 +78,8 @@ public:
         resize(m_width, m_height);
 
         /// opengl specific
-        std::string vstr = file_readbuff("ray.vert");
-        std::string fstr = file_readbuff("ray.frag");
+        std::string vstr = file_readbuff("../shaders/shadertoy.vert");
+        std::string fstr = file_readbuff("../shaders/raymarching-primitives.frag");
         m_filter = new FilterRay(vstr, fstr);
         m_filter->resize(m_width, m_height);
         m_filter->setOutput(NULL);

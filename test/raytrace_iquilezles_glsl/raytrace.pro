@@ -29,9 +29,8 @@ HEADERS += \
 
 INCLUDEPATH += \
     ../../src \
-    ../../
+    ../../3rdparty
 
 OTHER_FILES += \
-    bin/ray.vert \
-    bin/ray.frag
+    shaders/*.*
 
