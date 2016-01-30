@@ -30,5 +30,5 @@ HEADERS += \
 
 INCLUDEPATH += \
     ../../src \
-    ../../
+    ../../3rdparty
 
