@@ -12,22 +12,27 @@ LIBS += -lGL -lpng
 CCFLAG +=  -Wno-pointer-to-int-cast
 #-std=c++0x -fpermissive -Wno-permissive
 
+BCC_DIR = ../../src
+
 SOURCES += \
-    main.cpp \
-    ../../src/filters/*.cpp \
-    ../../src/glwrap/*.cpp \
-    ../../src/image/*.cpp \
-    ../../src/math/*.cpp \
-    ../../src/utils/*.cpp
+    src/main.cpp \
+    $$BCC_DIR/filters/*.cpp \
+    $$BCC_DIR/glwrap/*.cpp \
+    $$BCC_DIR/image/*.cpp \
+    $$BCC_DIR/math/*.cpp \
+    $$BCC_DIR/utils/*.cpp \
+
 
 HEADERS += \
-    ../../src/filters/*.h \
-    ../../src/glwrap/*.h \
-    ../../src/image/*.h \
-    ../../src/math/*.h \
-    ../../src/utils/*.h
+    $$BCC_DIR/filters/*.h \
+    $$BCC_DIR/glwrap/*.h \
+    $$BCC_DIR/image/*.h \
+    $$BCC_DIR/math/*.h \
+    $$BCC_DIR/utils/*.h \
+
 
 INCLUDEPATH += \
-    ../../src \
-    ../../
+    $$BCC_DIR \
+    ../../3rdparty
+
 

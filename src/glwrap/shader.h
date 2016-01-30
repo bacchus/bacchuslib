@@ -40,8 +40,8 @@ public:
             if (info_len > 1) {
                 char* info_log = new char[info_len];
                 glGetShaderInfoLog(id, info_len, NULL, info_log);
-                LOG_ERROR("Shader error:\n%s\n", info_log);
-                //LOG_ERROR("Shader:\n%s\n", m_source.c_str());
+                LOGE("Shader error:\n%s\n", info_log);
+                //LOGE("Shader:\n%s\n", m_source.c_str());
                 std::map<int,int> err_map;
                 parseErrLog(info_log, err_map);
                 printShader(err_map);
@@ -93,7 +93,7 @@ public:
                 oss << &spacer[0] << "^\n";
             }
         }
-        LOG_INFO("\n%s\n", oss.str().c_str());
+        LOGI("\n%s\n", oss.str().c_str());
     }
 
 private:

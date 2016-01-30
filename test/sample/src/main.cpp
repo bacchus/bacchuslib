@@ -22,9 +22,9 @@ public:
     GLTest(QWidget* parent = 0)
         : QGLWidget(parent)
     {
-        ALOGD("Hello kittie!");
+        LOGD("Hello kittie!");
 
-        bacchus::read_png_mirrored("test.png", m_img);
+        bacchus::read_png_mirrored("../img/test.png", m_img);
 
         /// setup qt window
         setWindowTitle("Hello kittie");
