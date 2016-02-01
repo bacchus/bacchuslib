@@ -106,6 +106,15 @@ inline std::string file_readbuff(const std::string& fname) {
     return "";
 }
 
+//TODO: c, not tested
+//inline long getFileSize(FILE* inFile) {
+//    long curPos = ftell(inFile);
+//    fseek(inFile, 0, SEEK_END);
+//    long fileSize = ftell(inFile);
+//    fseek(inFile, curPos, SEEK_SET);
+//    return fileSize;
+//}
+
 //TODO: posix, not tested
 //inline int file_size(const char* fname) {
 //    struct stat fileStat;

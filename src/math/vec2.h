@@ -14,13 +14,14 @@ struct vec2 {
     explicit vec2(const T& c): x(c), y(c) {}
     vec2(const T& x, const T& y): x(x), y(y) {}
     explicit vec2(const T* rawp): x(rawp[0]), y(rawp[1]) {}
+    vec2(const vec2<T>& v) : x(v.x), y(v.y) {}
     template<typename U> vec2(const vec2<U>& v) : x(v.x), y(v.y) {}
 
-    T& operator[](int i) {
+    T& operator[](uint i) {
         return (&(this->x))[i];
     }
 
-    const T& operator[](int i) const {
+    const T& operator[](uint i) const {
         return (&(this->x))[i];
     }
 
@@ -64,11 +65,15 @@ struct vec2 {
                     y*y);
     }
 
-    vec2<T>& normalize() {
+    T length2() const {
+        return x*x +
+               y*y;
+    }
+
+    void normalize() {
         T inv = T(1)/length();
         x *= inv;
         y *= inv;
-        return *this;
     }
 };
 
@@ -178,6 +183,26 @@ template<typename T>
 inline std::ostream& operator <<(std::ostream& ostr, const vec2<T>& v) {
     return ostr << v.x << " "
                 << v.y;
+}
+
+template<typename T>
+inline bool operator==(const vec2<T>& v0, const vec2<T>& v1) {
+    return (eq(v0.x, v1.x) && eq(v0.y, v1.y));
+}
+
+template<typename T>
+inline bool operator!=(const vec2<T>& v0, const vec2<T>& v1) {
+    return !(v0==v1);
+}
+
+template<typename T>
+inline bool operator<(const vec2<T>& v0, const vec2<T>& v1) {
+    return (v0.x < v1.x) || (eq(v0.x, v1.x) && (v0.y < v1.y));
+}
+
+template<typename T>
+inline bool operator>(const vec2<T>& v0, const vec2<T>& v1) {
+    return (v0.x > v1.x) || (eq(v0.x, v1.x) && (v0.y > v1.y));
 }
 
 typedef vec2<float> vec2f;

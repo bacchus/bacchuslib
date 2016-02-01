@@ -131,9 +131,27 @@ inline bool le(float a, float b) {
     return a < (b + BCC_M_FLOAT_EPSILON);
 }
 
+inline int div(int a, int b) {
+    int d = a % b;
+    if (d < 0)
+        d += b;
+    return d;
+}
+
 inline int mod(int a, int b) {
     if (b==0) return a;
     return a % b;
+}
+
+template<typename T>
+inline int sgn(T x) {
+    T zero(0);
+    if (x < zero)
+        return -1;
+    else if (x > zero)
+        return 1;
+    else
+        return 0;
 }
 
 template <typename T>
