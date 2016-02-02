@@ -27,6 +27,21 @@ struct tga_header {
 };
 #pragma pack(pop)
 
+// alternate
+//struct tga_header
+//{
+//    unsigned char idLength;
+//    unsigned char colorMapType;
+//    unsigned char imageTypeCode;
+//    unsigned char colorMapSpec[5];
+//    unsigned short xOrigin;
+//    unsigned short yOrigin;
+//    unsigned short width;
+//    unsigned short height;
+//    unsigned char bpp;
+//    unsigned char imageDesc;
+//};
+
 class tga_read_struct {
 public:
     tga_read_struct(Image &img): m_img(img) {}
@@ -58,12 +73,14 @@ private:
 //        fs.read(reinterpret_cast<char*>(m_img.dat8), size);
 
 //        if (header.bitsperpixel==24) {
+//            // glPixelStorei(GL_UNPACK_ALIGNMENT, 1); GL_RGB
 //            for (int i=0; i<size; i+=3) {
 //                unsigned char c = m_img.dat8[i];
 //                m_img.dat8[i] = m_img.dat8[i+2];
 //                m_img.dat8[i+2] = c;
 //            }
 //        } else if (header.bitsperpixel==32) {
+//            // glPixelStorei(GL_UNPACK_ALIGNMENT, 2); GL_RGBA
 //            for (int i=0; i<size; i+=4) {
 //                unsigned char c = m_img.dat8[i];
 //                m_img.dat8[i] = m_img.dat8[i+2];

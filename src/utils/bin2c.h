@@ -25,7 +25,9 @@ void writeCppFile(const char* fileName, const char* name, uchar* buff, long buff
         if (i % 10 == 0)
             fprintf(outFile, "\n");
     }
-    fprintf(outFile, "0x%02x };\n", buff[buffSize-1]);
+    fprintf(outFile, "0x%02x", buff[buffSize-1]);
+    //fprintf(outFile, "0x00"); // zero-terminated
+    fprintf(outFile, "\n};\n");
     fclose(outFile);
 }
 

@@ -26,6 +26,7 @@
 namespace bacchus {
 
 typedef unsigned char uchar;// 1B = 8b
+typedef unsigned short ushort;// 2B = 16b
 typedef unsigned int uint;  // 4B = 32b
 typedef unsigned long ulong;// 8B = 64b
 
