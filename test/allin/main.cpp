@@ -86,7 +86,7 @@ public:
     GLTest(QWidget* parent = 0)
         : QGLWidget(parent)
     {
-        ALOGD("Hello kittie!");
+        LOGD("Hello kittie!");
 
 //        for (int i = 0; i < 9; ++i) {
 //            m_oimg[i] = m_img;

@@ -66,7 +66,7 @@ public:
     GLTest(QWidget* parent = 0)
         : QGLWidget(parent)
     {
-        ALOGD("Hello kittie!");
+        LOGD("Hello kittie!");
 
         /// setup qt window
         setWindowTitle("Hello kittie");

@@ -2,7 +2,8 @@
 #include <string>
 
 #include <GL/glew.h>
-#include <GL/gl.h>
+//#include <GLES3/gl3.h>
+//#include <GL/gl.h>
 
 #include <QDebug>
 #include <QApplication>
@@ -217,7 +218,7 @@ protected:
 
     virtual void initializeGL() {
         mFps.start(this, 10);
-        qDebug() << getDriverInfoString();
+        getDriverInfoString();
     }
 
     virtual void paintGL() {
@@ -225,41 +226,42 @@ protected:
         mFps.draw(this);
     }
 
-    QString getDriverInfoString() const {
+    void getDriverInfoString() const {
         if(!context()->isValid())
-            return QString("<invalid OpenGL context>");
+            std::cout << "<invalid OpenGL context>" << std::endl;
 
         // read OpenGL infos
-        QString text;
-        text += tr("Vendor:   %1\n").arg((const char*)glGetString(GL_VENDOR));
-        text += tr("Renderer: %1\n").arg((const char*)glGetString(GL_RENDERER));
-        text += tr("Version:  %1\n").arg((const char*)glGetString(GL_VERSION));
-        text += tr("\n");
+        std::cout << "Vendor:   " << (const char*)glGetString(GL_VENDOR)   << std::endl;
+        std::cout << "Renderer: " << (const char*)glGetString(GL_RENDERER) << std::endl;
+        std::cout << "Version:  " << (const char*)glGetString(GL_VERSION)  << std::endl;
+        std::cout << std::endl;
 
         // print framebuffer format
         QGLFormat fmt = context()->format();
-        text += tr("Framebuffer Format:\n");
-        text += tr(" RGBA bits:    (%1,%2,%3,%4)\n").
-                arg(fmt.redBufferSize()).
-                arg(fmt.greenBufferSize()).
-                arg(fmt.blueBufferSize()).
-                arg(fmt.alphaBufferSize());
-        text += tr(" Depth bits:   %1\n").arg(fmt.depthBufferSize());
-        text += tr(" Stencil bits: %1\n").arg(fmt.stencilBufferSize());
-        text += tr("\n");
+        std::cout << "Framebuffer Format:" << std::endl;
+        std::cout << " RGBA bits:    "
+                  << "(" << fmt.redBufferSize()
+                  << "," << fmt.greenBufferSize()
+                  << "," << fmt.blueBufferSize()
+                  << "," << fmt.alphaBufferSize()
+                  << ")" << std::endl;
+        std::cout << " Depth bits:   " << fmt.depthBufferSize() << std::endl;
+        std::cout << " Stencil bits: " << fmt.stencilBufferSize() << std::endl;
+        std::cout << std::endl;
 
         // shading language version
         if (fmt.openGLVersionFlags() & fmt.OpenGL_Version_2_0) {
-            QString version((const char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
-            text += QString("Shading Language Version: %1\n").arg(version);
+            std::cout << "Shading Language Version: "
+                      << (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION)
+                      << std::endl;
         }
 
-        text += tr("\n");
+        std::cout << std::endl;
 
         GLint i;
 #define PRINT_CONSTANT(Name) \
     glGetIntegerv(Name, &i); \
-    text += tr(#Name " = %1\n").arg(i);
+    std::cout << #Name " = " << i << std::endl;
 
         PRINT_CONSTANT(GL_MAX_TEXTURE_SIZE);
         PRINT_CONSTANT(GL_MAX_TEXTURE_UNITS);
@@ -273,7 +275,6 @@ protected:
         PRINT_CONSTANT(GL_MAX_FRAGMENT_UNIFORM_COMPONENTS);
 #undef PRINT_CONSTANT
 
-        return text;
     }
 
 

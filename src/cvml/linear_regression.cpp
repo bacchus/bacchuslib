@@ -12,7 +12,7 @@ void load_data(const std::string &filename, matxf &x, matxf &y, bool add_1) {
     in.open(filename, std::ifstream::in);
     if (in.fail()) {
         std::string err_msg = "could not load file: " + filename;
-        LOG_ERROR(err_msg.c_str());
+        LOGE(err_msg.c_str());
         throw LogicError(err_msg.c_str());
     }
     std::string line;

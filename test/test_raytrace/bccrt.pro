@@ -29,6 +29,7 @@ HEADERS += \
     ../../src/utils/*.h
 
 INCLUDEPATH += \
+    ../../3rdparty \
     ../../src \
     ../../
 
