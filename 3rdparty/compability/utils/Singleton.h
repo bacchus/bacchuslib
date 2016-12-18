@@ -1,5 +1,4 @@
-#ifndef SINGLETON_H
-#define SINGLETON_H
+#pragma once
 
 namespace android {
 
@@ -34,6 +33,3 @@ private:
     template class Singleton< TYPE >;
 
 } // namespace android
-
-#endif // SINGLETON_H
-

@@ -1,5 +1,4 @@
-#ifndef KEYEDVECTOR_H
-#define KEYEDVECTOR_H
+#pragma once
 
 #include <map>
 
@@ -42,6 +41,3 @@ public:
 private:
     std::map<Key, Val> mMap;
 };
-
-#endif // KEYEDVECTOR_H
-

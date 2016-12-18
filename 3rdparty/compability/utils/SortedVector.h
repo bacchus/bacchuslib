@@ -1,5 +1,4 @@
-#ifndef SORTEDVECTOR_H
-#define SORTEDVECTOR_H
+#pragma once
 
 #include <vector>
 #include <algorithm>
@@ -32,6 +31,3 @@ public:
 private:
     std::vector<Val> mVec;
 };
-
-#endif // SORTEDVECTOR_H
-

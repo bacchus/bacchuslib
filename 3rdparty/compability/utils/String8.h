@@ -1,5 +1,4 @@
-#ifndef STRING8_H
-#define STRING8_H
+#pragma once
 
 #include <string>
 
@@ -27,6 +26,3 @@ public:
 private:
     std::string mStr;
 };
-
-#endif // STRING8_H
-

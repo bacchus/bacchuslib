@@ -1,5 +1,4 @@
-#ifndef LOG_H
-#define LOG_H
+#pragma once
 
 #include <stdarg.h>
 #include <cstdio>
@@ -32,6 +31,3 @@ static int bcc_log_print_impl(const char* prio, const char* tag, const char* fil
 #define LOG_DEBUG(...) BCC_LOG(LOG_DEBUD, "BACCHUS", __VA_ARGS__)
 #define LOG_INFO(...) BCC_LOG(LOG_INFO, "BACCHUS", __VA_ARGS__)
 #define LOG_ERROR(...) BCC_LOG(LOG_ERROR, "BACCHUS", __VA_ARGS__)
-
-#endif // LOG_H
-

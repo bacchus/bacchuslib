@@ -1,7 +1,3 @@
-#ifndef COMPILER_H
-#define COMPILER_H
+#pragma once
 
 #define ANDROID_API
-
-#endif // COMPILER_H
-
