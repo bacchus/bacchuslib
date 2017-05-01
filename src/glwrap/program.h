@@ -3,7 +3,7 @@
 #include <map>
 #include <vector>
 
-#include <GLES3/gl3.h>
+#include "glinclude.h"
 
 #include "shader.h"
 #include "attribute.h"

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <GLES3/gl3.h>
+#include "glinclude.h"
 
 #include "math/mdefs.h"
 #include "utils/logger.h"

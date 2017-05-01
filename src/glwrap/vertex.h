@@ -2,7 +2,7 @@
 
 #include <cstring>
 
-#include <GLES3/gl3.h>
+#include "glinclude.h"
 
 namespace bacchus {
 

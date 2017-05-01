@@ -1,5 +1,4 @@
-QT += core gui opengl
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+QT += core gui opengl widgets
 CONFIG += c++11
 
 TARGET = sample
@@ -7,8 +6,9 @@ TARGET = sample
 DESTDIR = bin
 OBJECTS_DIR = obj
 MOC_DIR = obj
-LIBS += -lGL -lpng
-#DEFINES += BCC_DEBUG_GLERROR
+LIBS += -lglut -lGL -lGLU -lGLEW -lpng
+DEFINES += LINUX=1 GL_GLEXT_PROTOTYPES
+#BCC_DEBUG_GLERROR
 CCFLAG +=  -Wno-pointer-to-int-cast
 #-std=c++0x -fpermissive -Wno-permissive
 
