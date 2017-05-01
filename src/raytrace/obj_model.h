@@ -1,8 +1,10 @@
 #pragma once
 
+#include <map>
 #include <vector>
 #include <string>
 
+#include "math/vec4.h"
 #include "math/vec3.h"
 #include "math/vec2.h"
 
@@ -10,7 +12,26 @@ namespace bacchus {
 
 class Model {
 public:
-    Model(const char *filename);
+    struct Material {
+
+        Material()
+            : ambi(0.2f, 0.2f, 0.2f, 1.0f)
+            , diff(0.8f, 0.8f, 0.8f, 1.0f)
+            , spec(0.0f, 0.0f, 0.0f, 1.0f)
+            , shine(0.0f), alpha(1.0f)
+        {}
+
+        vec4f ambi;
+        vec4f diff;
+        vec4f spec;
+        float shine;
+        float alpha;
+        std::string name;
+        std::string colorMap;
+        std::string bumpMap;
+    };
+
+    Model(const std::string& filename);
     ~Model();
 
     int nverts() const;
@@ -25,6 +46,7 @@ public:
     //vec3f normal(vec2f uv);
 
 private:
+    void loadMtllib(const std::string& filename);
     void calcBounds();
 
 private:
@@ -36,6 +58,9 @@ private:
     //TGAImage normalmap_;
     //TGAImage specularmap_;
     //void load_texture(std::string filename, const char *suffix, TGAImage &img);
+
+    std::vector<Material> m_mtl;
+    std::map<std::string, int> m_mtl_cache;
 
     vec3f m_center;
     vec3f m_size;

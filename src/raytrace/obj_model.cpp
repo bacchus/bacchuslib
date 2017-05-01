@@ -6,7 +6,7 @@
 
 namespace bacchus {
 
-Model::Model(const char *filename)
+Model::Model(const std::string& filename)
     : m_faces()
     , m_verts()
     , m_norms()
@@ -17,40 +17,118 @@ Model::Model(const char *filename)
     in.open(filename, std::ifstream::in);
     if (in.fail()) return;
     std::string line;
+    int cur_mtl = 0;
+
     while (!in.eof()) {
         std::getline(in, line);
         std::istringstream iss(line.c_str());
         char trash;
+
         if (!line.compare(0, 2, "v ")) {
             iss >> trash;
             vec3f v;
             for (int i=0;i<3;i++) iss >> v[i];
             m_verts.push_back(v);
+
         } else if (!line.compare(0, 3, "vn ")) {
             iss >> trash >> trash;
             vec3f n;
             for (int i=0;i<3;i++) iss >> n[i];
             m_norms.push_back(n);
+
         } else if (!line.compare(0, 3, "vt ")) {
             iss >> trash >> trash;
             vec2f uv;
             for (int i=0;i<2;i++) iss >> uv[i];
             m_uv.push_back(uv);
+
         }  else if (!line.compare(0, 2, "f ")) {
+            // v, v//vn, v/vt, v/vt/vn
+            // in wavefront obj all indices start at 1, not zero
+            // so we use: tmp -= vec3i(1);
             std::vector<vec3i> f;
             vec3i tmp;
             iss >> trash;
-            while (iss >> tmp[0] >> trash >> tmp[1] >> trash >> tmp[2]) {
-                for (int i=0; i<3; i++) tmp[i]--; // in wavefront obj all indices start at 1, not zero
-                f.push_back(tmp);
+
+//            if (line.find("//") != std::string::npos) {
+//                // v//vn case 2: must cope with it
+//                while (iss >> tmp[0] >> trash >> trash >> tmp[2])
+//                    f.push_back(tmp - vec3i(1));
+//                m_faces.push_back(f);
+//            } else
+            {
+                std::string token;
+                iss >> token;
+                std::istringstream token_iss(token.c_str());
+
+                int n = 0;
+                std::string::size_type pos = token.find_first_of("/", 0);
+                while (pos != std::string::npos) {
+                    pos = token.find_first_of("/", pos);
+                    ++n;
+                }
+
+                switch (n) {
+                case 0:
+                    token_iss >> tmp[0];
+                    f.push_back(tmp - vec3i(1));
+                    while (iss >> tmp[0])
+                        f.push_back(tmp - vec3i(1));
+                    break;
+
+                case 1:
+                    token_iss >> tmp[0] >> trash >> tmp[1];
+                    f.push_back(tmp - vec3i(1));
+                    while (iss >> tmp[0] >> trash >> tmp[1])
+                        f.push_back(tmp - vec3i(1));
+                    break;
+
+                case 2:
+                    token_iss >> tmp[0] >> trash >> tmp[1] >> trash >> tmp[2];
+                    f.push_back(tmp - vec3i(1));
+                    while (iss >> tmp[0] >> trash >> tmp[1] >> trash >> tmp[2])
+                        f.push_back(tmp - vec3i(1));
+                    break;
+
+                default:
+                    break;
+                }
             }
+
             m_faces.push_back(f);
+
+            // BCC: added 'v, v//vn, v/vt, v/vt/vn' variations
+//            while (iss >> tmp[0] >> trash >> tmp[1] >> trash >> tmp[2]) {
+//                // in wavefront obj all indices start at 1, not zero
+//                for (int i=0; i<3; i++) tmp[i]--;
+//                f.push_back(tmp);
+//            }
+//            m_faces.push_back(f);
+
+        } else if (!line.compare(0, 7, "mtllib ")) {
+            // mtllib
+            size_t pos = filename.find_last_of("\\/");
+            std::string name = (pos == std::string::npos
+                                ? "" : filename.substr(0, pos));
+            name += line.substr(7);
+            loadMtllib(name);
+
+        } else if (!line.compare(0, 7, "usemtl ")) {
+            // usemtl
+            std::string name = line.substr(7);
+            cur_mtl = (m_mtl_cache.find(name) == m_mtl_cache.end()
+                       ? 0 : m_mtl_cache[name]);
         }
     }
     //std::cout << "# v# " << m_verts.size() << " f# "  << m_faces.size() << " vt# " << m_uv.size() << " vn# " << m_norms.size() << std::endl;
     //load_texture(filename, "_diffuse.tga", diffusemap_);
     //load_texture(filename, "_nm_tangent.tga",      normalmap_);
     //load_texture(filename, "_spec.tga",    specularmap_);
+
+    //    buildMeches();
+    //    calcBounds();
+    //    genNorms();
+    //    genTangs();
 }
 
 Model::~Model() {
@@ -92,6 +170,76 @@ vec2f Model::uv(int iface, int nthvert) const {
     return m_uv[m_faces[iface][nthvert][1]];
 }
 
+void Model::loadMtllib(const std::string &filename)
+{
+    std::ifstream in;
+    in.open(filename, std::ifstream::in);
+    if (in.fail()) return;
+    std::string line;
+    int cur_mtl = 0;
+    int illum = 0;
+
+    while (!in.eof()) {
+        std::getline(in, line);
+        std::istringstream iss(line.c_str());
+        std::string trash;
+        float ftmp;
+        vec3f tmp;
+
+        if (!line.compare(0, 7, "newmtl ")) {
+            Material mtl;
+            cur_mtl = m_mtl.size();
+            mtl.name = line.substr(7);
+            m_mtl_cache[mtl.name] = cur_mtl;
+            m_mtl.push_back(mtl);
+
+        } else if (!line.compare(0, 3, "Ns ")) {
+            // shininess is 0..1000 scale to 0..1
+            iss >> trash;
+            iss >> ftmp;
+            m_mtl[cur_mtl].shine = ftmp/1000.0f;
+
+        } else if (!line.compare(0, 3, "Tr ")) {
+            iss >> trash;
+            iss >> ftmp;
+            m_mtl[cur_mtl].alpha = 1.0f - ftmp;
+
+        } else if (!line.compare(0, 1, "d")) {
+            iss >> trash;
+            iss >> ftmp;
+            m_mtl[cur_mtl].alpha = ftmp;
+
+        } else if (!line.compare(0, 3, "Ka ")) {
+            iss >> trash;
+            iss >> tmp[0] >> tmp[1] >> tmp[2];
+            m_mtl[cur_mtl].ambi = vec4f(ftmp, 1.0f);
+
+        } else if (!line.compare(0, 3, "Kd ")) {
+            iss >> trash;
+            iss >> tmp[0] >> tmp[1] >> tmp[2];
+            m_mtl[cur_mtl].diff = vec4f(ftmp, 1.0f);
+
+        } else if (!line.compare(0, 3, "Ks ")) {
+            iss >> trash;
+            iss >> tmp[0] >> tmp[1] >> tmp[2];
+            m_mtl[cur_mtl].spec = vec4f(ftmp, 1.0f);
+
+        } else if (!line.compare(0, 6, "illum ")) {
+            iss >> trash;
+            iss >> illum;
+            if (illum == 1)
+                m_mtl[cur_mtl].spec = vec4f(vec3f(0.0f), 1.0f);
+
+        } else if (!line.compare(0, 7, "map_Kd ")) {
+            m_mtl[cur_mtl].colorMap = line.substr(7);
+
+        } else if (!line.compare(0, 9, "map_bump ")) {
+            m_mtl[cur_mtl].bumpMap = line.substr(9);
+
+        }
+    }
+}
+
 void Model::calcBounds()
 {
     if (m_verts.empty())
@@ -108,7 +256,7 @@ void Model::calcBounds()
 
     m_center = 0.5f*(vmin + vmax);
     m_size = vmax - vmin;
-    m_radius = max3(m_size.x, m_size.y, m_size.z);
+    m_radius = max(m_size);
 }
 
 //void Model::load_texture(std::string filename, const char *suffix, TGAImage &img) {
