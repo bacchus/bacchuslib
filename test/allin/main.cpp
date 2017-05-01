@@ -88,6 +88,7 @@ public:
     {
         LOGD("Hello kittie!");
 
+        /// laod images
 //        for (int i = 0; i < 9; ++i) {
 //            m_oimg[i] = m_img;
 //            oimg_name[i] = "xz";
@@ -105,7 +106,9 @@ public:
         m_oimg[0] = m_oimg[1] = m_oimg[2] = m_oimg[3] = m_img;
         m_oimg[0].clear().to_a1();//.to_gray();
 
-        if (1) {
+        //====================================================================
+        /// FFT test
+        if (0) {
             int fs = 10000;
             int f1 = 80;
             matxf x1 = genSine(1,f1,0,fs,1024);
@@ -117,11 +120,15 @@ public:
             plot.plotData(mag, Paint::green);
         }
 
+        //====================================================================
+        /// perlin noise
         if (0) {
             Paint paint(m_oimg[0]);
             paint.draw_perlin_noise();
         }
 
+        //====================================================================
+        /// handwriten curves
         if (0) {
             Paint paint(m_oimg[0]);
             vec2f o(50,0.5f*paint.resolution().y);
@@ -130,7 +137,7 @@ public:
             paint.draw_curve({vec2i(10,o.y), vec2i(1.2f*sz.x,o.y)}, Paint::green);
             paint.draw_curve({vec2i(o.x,100), vec2i(o.x,3*sz.y)}, Paint::red);
 
-//            paint.draw_bezier_curve(
+//            paint.draw_bezier_curve(u
 //                        vec2i(10,o.y)
 //                        , vec2i(o.x + 0.25f*sz.x, o.y - 40)
 //                        , vec2i(o.x + 0.75f*sz.x, o.y + 40)
@@ -147,6 +154,8 @@ public:
             paint.draw_curve(line, Paint::white);
         }
 
+        //====================================================================
+        /// plot x-y data
         if (0) {
             matxf x;
             matxf y;
@@ -155,6 +164,7 @@ public:
             plot.plotData(ext_col_get(x,1),y, Paint::red);
         }
 
+        //====================================================================
         /// raytracer
         if (0) {
             raytrace();
@@ -166,9 +176,9 @@ public:
 //        Histogram::threshold_constant(m_oimg[0], m_img, 128);
 //        Morphology::thinn(m_oimg[1], m_oimg[0]);
 
-
+        //====================================================================
         /// 3d renderer shader
-        if (0) {
+        if (1) {
             //TODO: crashes if image not initialized
             m_oimg[0].clear().to_a1();//.to_gray();
             Model model("model.obj");
@@ -238,12 +248,17 @@ public:
             }
         }
 
+        //====================================================================
         /// Paint text
-//        Paint paint(m_oimg[0]);
-//        paint.draw_text("Hello World! =)", vec2i(100,100), lum2i(255));
-//        const char* test_str = "abcdefghijklmnopqrstuvwxyz0123456789!?:=,.-() #'*/";
-//        paint.draw_text(test_str, vec2i(100,200), lum2i(255));
-//        paint.draw_text("2+3*7=19; sag,dth, drry", vec2i(100,300), lum2i(255));
+        if (0) {
+            Paint paint(m_oimg[0]);
+            paint.draw_text("Hello World! =)", vec2i(100,600), rgba2i(250, 250, 80));
+            const char* test_str = "abcdefghijklmnopqrstuvwxyz0123456789!?:=,.-() #'*/";
+            paint.draw_text(test_str, vec2i(100,500), lum2i(255));
+            paint.draw_text("2+3*7=19; sag,dth, drry", vec2i(100,300), rgba2i(250, 40, 80));
+        }
+
+        //====================================================================
         /// find normals
 //         vec3f n = cross(world[2] - world[0], world[1] - world[0]).normalize();
         /// save norm map to image
@@ -267,35 +282,44 @@ public:
 //            }
 //        }
 
+        //====================================================================
         /// nice mandelbrought
-//        bacchus::Image img(m_img);
-//        img.draw_fractal_mandelbrot();
-//        img.threshold_adaptive(10);
-//        img.dilate(2);
-//        img.thinn();
-//        m_oimg[0] = img.logic_or(m_img);
+        if (0) {
+            Paint paint(m_oimg[0]);
+            paint.draw_fractal_mandelbrot();
 
+//            Histogram::threshold_adaptive(m_oimg[1], m_oimg[0], 10);
+//            Morphology::dilate(m_oimg[2], m_oimg[1], 2);
+//            Morphology::thinn(m_oimg[1], m_oimg[2]);
+//            Arthops::logic_or(m_oimg[0], m_oimg[0], m_oimg[1]);
+        }
+
+        //====================================================================
         /// draw lines in hough transform
-//        std::vector<vec2f> res = Hough::transform(m_oimg[3], m_oimg[1]); oimg_name[0] = "hough";
-//        Paint p5(m_oimg[2]);
-//        for (uint i = 0; i < res.size(); ++i) {
-//            float si = sin(res[i].x);
-//            float co = cos(res[i].x);
-//            float ro = res[i].y;
-//            int wi = m_img.width;
-//            int he = m_img.height;
-//            if (eq(si, 0.f)) {
-//                p5.draw_line(vec2i(ro,0), vec2i(ro,he), Paint::orange);
-//            } else {
-//                float y0 = ro/si;
-//                float yw = y0 - wi*co/si;
-//                p5.draw_line(vec2i(0,y0), vec2i(wi,yw), Paint::orange);
-//            }
-//            res[i].x = rad2deg(res[i].x);
-//            std::cout<<res[i]<<"; ";
-//        }
-//        std::cout<<std::endl;
+        if (0) {
+            std::vector<vec2f> res = Hough::transform(m_oimg[3], m_oimg[1]);
+            oimg_name[0] = "hough";
+            Paint p5(m_oimg[2]);
+            for (uint i = 0; i < res.size(); ++i) {
+                float si = sin(res[i].x);
+                float co = cos(res[i].x);
+                float ro = res[i].y;
+                int wi = m_img.width;
+                int he = m_img.height;
+                if (eq(si, 0.f)) {
+                    p5.draw_line(vec2i(ro,0), vec2i(ro,he), Paint::orange);
+                } else {
+                    float y0 = ro/si;
+                    float yw = y0 - wi*co/si;
+                    p5.draw_line(vec2i(0,y0), vec2i(wi,yw), Paint::orange);
+                }
+                res[i].x = rad2deg(res[i].x);
+                std::cout<<res[i]<<"; ";
+            }
+            std::cout<<std::endl;
+        }
 
+        //====================================================================
         /// setup qt window
         setWindowTitle("Hello kittie");
         setAttribute(Qt::WA_QuitOnClose);

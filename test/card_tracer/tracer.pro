@@ -3,6 +3,8 @@ DESTDIR = bin
 
 CONFIG -= qt
 
+TARGET = card
+
 #QT -= core qui console windows opengl
 #QMAKE_CXXFLAGS += -ansi -pedantic -Wconversion -Wshadow -Wcast-qual -Wwrite-strings
 # defaults: -Wall -W
@@ -32,5 +34,5 @@ FORMS += \
 #RESOURCES += icons.qrc
 #MOC_DIR = qt
 #UI_DIR = qt
-#DEFINES += 
+#DEFINES +=
 

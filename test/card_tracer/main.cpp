@@ -1,5 +1,6 @@
 // http://tproger.ru/translations/business-card-raytracer/
-#include <stdlib.h>   // card > aek.ppm
+// card > aek.ppm
+#include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
 
