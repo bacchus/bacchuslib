@@ -8,6 +8,7 @@ Filter::Filter(const std::string& vert, const std::string& frag)
     : mVertSrc(vert)
     , mFragSrc(frag)
     , mChanged(true)
+    , ratio (1.0f)
 {
     pass_0 = new Program(mVertSrc.c_str(), mFragSrc.c_str());
     pass_0->set_draw_mode(GL_TRIANGLE_FAN, 4);
@@ -15,6 +16,7 @@ Filter::Filter(const std::string& vert, const std::string& frag)
     pass_0->vertex("posAttr") = new Vertex(gPosTex, 4, 2, 4, 0);
     pass_0->vertex("texAttr") = new Vertex(gPosTex, 4, 2, 4, 2);
     pass_0->parameter("matrix") = &mat;
+    mat.set_scale(1.0f, 1.0f);
 }
 
 Filter::~Filter() {
@@ -37,8 +39,7 @@ void Filter::resize(int w, int h) {
     onResize(w,h);
     width = w;
     height = h;
-    w>h ? mat.set_scale(h/float(w), 1.0f) : mat.set_scale(1.0f, w/float(h));
-    //mat.set_scale(1.0f, 1.0f);
+    w>h ? mat.set_scale(ratio*h/float(w), 1.0f) : mat.set_scale(1.0f, w/float(ratio*h));
     pass_0->set_out_size(w, h);
     mChanged = true;
 }
@@ -72,6 +73,10 @@ void Filter::setInput(Texture* inTex) {
 
 void Filter::setOutput(FrameBufferTexture* outFbt) {
     pass_0->set_out(outFbt);
+}
+
+void Filter::setRatio(float new_ratio) {
+    ratio = new_ratio;
 }
 
 } // namespace bacchus

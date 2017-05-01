@@ -53,9 +53,11 @@ public:
     virtual void setOutput(FrameBufferTexture* outFbt);
 
     void setChanged() { mChanged = true; }
+    void setRatio(float new_ratio); // w/h
 
 protected:
     int width, height;
+    float ratio;
     std::string mVertSrc;
     std::string mFragSrc;
     Program* pass_0;
