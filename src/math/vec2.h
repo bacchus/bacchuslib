@@ -169,6 +169,16 @@ inline vec2<T> min(const vec2<T>& v1, const vec2<T>& v2) {
 }
 
 template <typename T>
+inline T max(const vec2<T>& v) {
+    return std::max(v.x, v.y);
+}
+
+template <typename T>
+inline T min(const vec2<T>& v) {
+    return std::min(v.x, v.y);
+}
+
+template <typename T>
 inline vec2<T> floor(const vec2<T>& v1) {
     return vec2<T>(std::floor(v1.x),
                    std::floor(v1.y));

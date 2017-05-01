@@ -292,6 +292,16 @@ inline vec3<T> min(const vec3<T>& v1, const vec3<T>& v2) {
                    std::min(v1.z,v2.z));
 }
 
+template <typename T>
+inline T max(const vec3<T>& v) {
+    return max3(v.x, v.y, v.z);
+}
+
+template <typename T>
+inline T min(const vec3<T>& v) {
+    return min3(v.x, v.y, v.z);
+}
+
 //TODO: add to other vecs
 template <typename T>
 inline vec3<T> abs(const vec3<T>& v1) {

@@ -53,7 +53,12 @@ Model::Model(const char *filename)
     //load_texture(filename, "_spec.tga",    specularmap_);
 }
 
-Model::~Model() {}
+Model::~Model() {
+    m_faces.clear();
+    m_verts.clear();
+    m_norms.clear();
+    m_uv.clear();
+}
 
 int Model::nverts() const {
     return (int)m_verts.size();
@@ -85,6 +90,25 @@ vec3f Model::normal(int iface, int nthvert) const {
 
 vec2f Model::uv(int iface, int nthvert) const {
     return m_uv[m_faces[iface][nthvert][1]];
+}
+
+void Model::calcBounds()
+{
+    if (m_verts.empty())
+        return;
+
+    vec3f vmin = m_verts[0];
+    vec3f vmax = vmin;
+
+    for (int i = 1; i < m_verts.size(); ++i) {
+        vec3f v = m_verts[i];
+        vmin = min(vmin, v);
+        vmax = max(vmax, v);
+    }
+
+    m_center = 0.5f*(vmin + vmax);
+    m_size = vmax - vmin;
+    m_radius = max3(m_size.x, m_size.y, m_size.z);
 }
 
 //void Model::load_texture(std::string filename, const char *suffix, TGAImage &img) {

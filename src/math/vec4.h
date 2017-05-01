@@ -173,6 +173,18 @@ inline vec4<T> min(const vec4<T>& v1, const vec4<T>& v2) {
                    );
 }
 
+template <typename T>
+inline T max(const vec4<T>& v) {
+    return std::max(std::max(v.x, v.y)
+                    , std::max(v.z, v.w));
+}
+
+template <typename T>
+inline T min(const vec4<T>& v) {
+    return std::min(std::min(v.x, v.y)
+                    , std::min(v.z, v.w));
+}
+
 template<typename T>
 inline std::ostream& operator <<(std::ostream& ostr, const vec4<T>& v) {
     return ostr<<v.x<<" "<<v.y<<" "<<v.z<<" "<<v.w;
