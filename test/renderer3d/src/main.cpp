@@ -7,8 +7,11 @@
 #include <QKeyEvent>
 
 #include "image/png_rw.h"
+#include "image/tga_rw.h"
 #include "filters/filter_simple.h"
 #include "glwrap/program.h"
+#include "raytrace/obj_model.h"
+#include "filter_model3d.h"
 
 const float g_start_param = 1.0f;
 const float g_delta_param = 0.1f;
@@ -24,7 +27,8 @@ public:
     {
         LOGD("Hello kittie!");
 
-        bacchus::read_png_mirrored("../img/test.png", m_img);
+        bacchus::read_tga_mirrored("../res/diffuse.tga", m_img);
+        m_model = new bacchus::Model("../res/model.obj");
 
         /// setup qt window
         setWindowTitle("Hello kittie");
@@ -36,7 +40,8 @@ public:
 
         /// opengl specific
         m_tex = new bacchus::Texture(m_img.width, m_img.height, m_img.data());
-        m_filter = new bacchus::FilterSimple();
+
+        m_filter = new bacchus::FilterModel3d(*m_model);
         m_filter->resize(m_width, m_height);
         m_filter->setRatio(m_width/float(m_height));
         m_filter->setInput(m_tex);
@@ -46,6 +51,8 @@ public:
 
     ~GLTest() {
         delete m_filter;
+        delete m_tex;
+        delete m_model;
     }
 
     static int main(int argc, char* argv[]) {
@@ -127,7 +134,8 @@ private:
     bacchus::Image m_img;
     int m_width, m_height;
     bacchus::Texture* m_tex;
-    bacchus::FilterSimple* m_filter;
+    bacchus::FilterModel3d* m_filter;
+    bacchus::Model* m_model;
     float m_data;
 };
 

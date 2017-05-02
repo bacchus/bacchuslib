@@ -21,6 +21,8 @@ SOURCES += \
     $$BCC_DIR/image/*.cpp \
     $$BCC_DIR/math/*.cpp \
     $$BCC_DIR/utils/*.cpp \
+    src/filter_model3d.cpp \
+    ../../src/raytrace/obj_model.cpp
 
 
 HEADERS += \
@@ -29,6 +31,8 @@ HEADERS += \
     $$BCC_DIR/image/*.h \
     $$BCC_DIR/math/*.h \
     $$BCC_DIR/utils/*.h \
+    src/filter_model3d.h \
+    ../../src/raytrace/obj_model.h
 
 
 INCLUDEPATH += \

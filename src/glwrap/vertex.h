@@ -16,6 +16,7 @@ public:
         , m_stride(stride)
         , m_offset(offset)
     {
+        //TODO: to much copying why
         memcpy(m_mas, mas, stride*count*sizeof(float));
     }
 

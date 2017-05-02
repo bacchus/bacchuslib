@@ -12,6 +12,20 @@ namespace bacchus {
 
 class Model {
 public:
+
+    struct Vertex {
+
+        Vertex(const vec3f& vpos
+               , const vec2f& vtex
+               , const vec3f& vnrm)
+            : pos(vpos), tex(vtex), nrm(vnrm)
+        {}
+
+        vec3f pos;
+        vec2f tex;
+        vec3f nrm;
+    };
+
     struct Material {
 
         Material()
@@ -37,27 +51,38 @@ public:
     int nverts() const;
     int nfaces() const;
     std::vector<int> face(int idx) const;
-    vec3f normal(int iface, int nthvert) const;
     vec3f vert(int i) const;
     vec3f vert(int iface, int nthvert) const;
     vec2f uv(int iface, int nthvert) const;
+    vec3f normal(int iface, int nthvert) const;
     //TGAColor diffuse(vec2f uv);
     //float specular(vec2f uv);
     //vec3f normal(vec2f uv);
 
+    //TODO: this is material quality
+    bool transparent() const { return false; }
+    // TODO: here faces must be triangles
+    int vertex_count() const { return m_mesh.size(); }
+    const float* pos_ptr() const { return &m_mesh[0].pos.x; }
+    const float* tex_ptr() const { return &m_mesh[0].tex.x; }
+    const float* nrm_ptr() const { return &m_mesh[0].nrm.x; }
+
 private:
     void loadMtllib(const std::string& filename);
     void calcBounds();
+    void buildMeshes();
 
 private:
     std::vector< std::vector<vec3i> > m_faces; // vertex/uv/normal
     std::vector<vec3f> m_verts;
-    std::vector<vec3f> m_norms;
     std::vector<vec2f> m_uv;
-    //TGAImage diffusemap_;
-    //TGAImage normalmap_;
-    //TGAImage specularmap_;
+    std::vector<vec3f> m_norms;
+    //TGAImage diffusemap;
+    //TGAImage normalmap;
+    //TGAImage specularmap;
     //void load_texture(std::string filename, const char *suffix, TGAImage &img);
+
+    std::vector<Vertex> m_mesh;
 
     std::vector<Material> m_mtl;
     std::map<std::string, int> m_mtl_cache;

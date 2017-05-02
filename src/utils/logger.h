@@ -49,29 +49,32 @@ inline int bcc_log_print_impl(const char* prio, const char* file, int line, cons
 static int gLogOnce = true;
 
 #ifdef BCC_CHECK_GL_ERROR
-#define CHECK_GL_ERROR(DRAW_COMMAND) DRAW_COMMAND; {    \
-    if (gLogOnce) LOGI(#DRAW_COMMAND);              \
+#define CHECK_GL_ERROR(DRAW_COMMAND)                    \
+    DRAW_COMMAND; {                                     \
+    if (gLogOnce) LOGI(#DRAW_COMMAND);                  \
     GLenum glStatus = GL_NO_ERROR;                      \
     while ((glStatus = glGetError()) != GL_NO_ERROR) {  \
     char errstr[50];                                    \
     switch (glStatus) {                                 \
     case GL_INVALID_ENUM:                               \
-    sprintf(errstr, "  intvalid enum! ");              \
+    sprintf(errstr, "  intvalid enum! ");               \
     break;                                              \
     case GL_INVALID_VALUE:                              \
-    sprintf(errstr, "  invalid value! ");             \
+    sprintf(errstr, "  invalid value! ");               \
     break;                                              \
     case GL_INVALID_OPERATION:                          \
-    sprintf(errstr, "  invalid operation! ");         \
+    sprintf(errstr, "  invalid operation! ");           \
     break;                                              \
     case GL_OUT_OF_MEMORY:                              \
     sprintf(errstr, "  out of memory! ");               \
-    break;                                              \
-    }                                                   \
-    LOGE("Check GL error " #DRAW_COMMAND ": %s 0x%x\n", errstr, glStatus);  \
-    }}
+    break; }                                            \
+    LOGE("Check GL error " #DRAW_COMMAND ": %s 0x%x\n"  \
+    , errstr, glStatus); }}
+
 #else // BCC_CHECK_GL_ERROR
-#define CHECK_GL_ERROR(DRAW_COMMAND) DRAW_COMMAND; { if (gLogOnce) LOGI(#DRAW_COMMAND); }
+#define CHECK_GL_ERROR(DRAW_COMMAND)                    \
+    DRAW_COMMAND; { if (gLogOnce) LOGI(#DRAW_COMMAND); }
+
 #endif // BCC_CHECK_GL_ERROR
 
 #else // BCC_DEBUG_GLERROR

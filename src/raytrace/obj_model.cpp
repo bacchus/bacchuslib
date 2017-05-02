@@ -7,11 +7,6 @@
 namespace bacchus {
 
 Model::Model(const std::string& filename)
-    : m_faces()
-    , m_verts()
-    , m_norms()
-    , m_uv()
-    //, diffusemap_(), normalmap_(), specularmap_()
 {
     std::ifstream in;
     in.open(filename, std::ifstream::in);
@@ -135,8 +130,8 @@ Model::Model(const std::string& filename)
 Model::~Model() {
     m_faces.clear();
     m_verts.clear();
-    m_norms.clear();
     m_uv.clear();
+    m_norms.clear();
 }
 
 int Model::nverts() const {
@@ -162,13 +157,13 @@ vec3f Model::vert(int iface, int nthvert) const {
     return m_verts[m_faces[iface][nthvert][0]];
 }
 
+vec2f Model::uv(int iface, int nthvert) const {
+    return m_uv[m_faces[iface][nthvert][1]];
+}
+
 vec3f Model::normal(int iface, int nthvert) const {
     int idx = m_faces[iface][nthvert][2];
     return normalize(m_norms[idx]);
-}
-
-vec2f Model::uv(int iface, int nthvert) const {
-    return m_uv[m_faces[iface][nthvert][1]];
 }
 
 void Model::loadMtllib(const std::string &filename)
@@ -258,6 +253,15 @@ void Model::calcBounds()
     m_center = 0.5f*(vmin + vmax);
     m_size = vmax - vmin;
     m_radius = max(m_size);
+}
+
+void Model::buildMeshes() {
+    for (int i = 0; i < nfaces(); ++i) {
+        for (int j = 0; j < 3; ++j) {
+            Vertex v(vert(i,j), uv(i,j), normal(i,j));
+            m_mesh.push_back(v);
+        }
+    }
 }
 
 //void Model::load_texture(std::string filename, const char *suffix, TGAImage &img) {

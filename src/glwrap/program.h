@@ -32,7 +32,7 @@ public:
     void createGl() {
         m_vert->createGl();
         m_frag->createGl();
-        id = CHECK_GL_ERROR(glCreateProgram());
+        CHECK_GL_ERROR(id = glCreateProgram());
         m_vert->attachto(id);
         m_frag->attachto(id);
         CHECK_GL_ERROR(glLinkProgram(id));
@@ -53,7 +53,8 @@ public:
 
     Attribute* attribute(const std::string& name) {
         if (m_attributes.find(name) == m_attributes.end()) {
-            int location = CHECK_GL_ERROR(glGetAttribLocation(id, name.c_str()));
+            int location;
+            CHECK_GL_ERROR(location = glGetAttribLocation(id, name.c_str()));
             m_attributes[name] = new Attribute(location);
         }
         return m_attributes[name];
@@ -61,7 +62,8 @@ public:
 
     Uniform* uniform(const std::string& name) {
         if (m_uniforms.find(name) == m_uniforms.end()) {
-            int location = CHECK_GL_ERROR(glGetUniformLocation(id, name.c_str()));
+            int location;
+            CHECK_GL_ERROR(location = glGetUniformLocation(id, name.c_str()));
             m_uniforms[name] = new Uniform(location);
         }
         return m_uniforms[name];
