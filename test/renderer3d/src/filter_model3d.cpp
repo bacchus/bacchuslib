@@ -25,8 +25,8 @@ static std::string fragSrc =
 
 FilterModel3d::FilterModel3d(const Model &model)
     : m_model(model)
-    , mChanged(true)
     , ratio (1.0f)
+    , mChanged(true)
 {
     pass_0 = new Program(vertSrc.c_str(), fragSrc.c_str());
     pass_0->set_out(nullptr);

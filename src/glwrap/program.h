@@ -48,6 +48,7 @@ public:
                 delete[] info_log;
             }
             CHECK_GL_ERROR(glDeleteProgram(id));
+            throw ShaderError("Shader link error");
         }
     }
 

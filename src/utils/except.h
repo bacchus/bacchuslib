@@ -22,4 +22,9 @@ public:
     LogicError(const char* msg): Error(msg) {}
 };
 
+class ShaderError: public Error {
+public:
+    ShaderError(const char* msg): Error(msg) {}
+};
+
 } // namespace bacchus

@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "utils/logger.h"
+#include "utils/except.h"
 
 namespace bacchus {
 
@@ -48,6 +49,7 @@ public:
                 delete[] info_log;
             }
             CHECK_GL_ERROR(glDeleteShader(id));
+            throw ShaderError("Shader compile error");
         }
     }
 
