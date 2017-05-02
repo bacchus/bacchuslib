@@ -1,3 +1,5 @@
+#pragma once
+
 #if ANDROID
 #include <GLES3/gl3.h>
 
