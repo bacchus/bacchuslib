@@ -9,23 +9,30 @@ namespace bacchus {
 class FrameBuffer {
 public:
 
-    static void bind(int framebuffer_id) {
-        CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id));
+    static void bind(int glid) {
+        CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, glid));
     }
 
     static void unbind() {
         CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 0));
     }
 
-    FrameBuffer(): id(0) {}
+    FrameBuffer()
+        : id(0)
+    {}
+
     FrameBuffer(uint w, uint h)
         : id(0)
         , m_width(w)
         , m_height(h)
     {}
 
-    explicit FrameBuffer(int glid): id(glid) {}
-    ~FrameBuffer() {}
+    explicit FrameBuffer(int glid)
+        : id(glid)
+    {}
+
+    ~FrameBuffer()
+    {}
 
     void createGl() {
         CHECK_GL_ERROR(glGenFramebuffers(1, &id));
@@ -61,7 +68,7 @@ public:
         fb_tex = new Texture(w, h);
     }
 
-    FrameBufferTexture(int glid, Texture* tex)
+    FrameBufferTexture(uint glid, Texture* tex)
         : FrameBuffer(glid)
         , fb_tex(tex)
     {
