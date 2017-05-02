@@ -56,7 +56,7 @@ Model::Model(const std::string& filename)
 //                    f.push_back(tmp - vec3i(1));
 //                m_faces.push_back(f);
 //            } else
-            {
+            /*{
                 std::string token;
                 iss >> token;
                 std::istringstream token_iss(token.c_str());
@@ -93,17 +93,18 @@ Model::Model(const std::string& filename)
                 default:
                     break;
                 }
-            }
 
-            m_faces.push_back(f);
+                m_faces.push_back(f);
+            }*/
+
 
             // BCC: added 'v, v//vn, v/vt, v/vt/vn' variations
-//            while (iss >> tmp[0] >> trash >> tmp[1] >> trash >> tmp[2]) {
-//                // in wavefront obj all indices start at 1, not zero
-//                for (int i=0; i<3; i++) tmp[i]--;
-//                f.push_back(tmp);
-//            }
-//            m_faces.push_back(f);
+            while (iss >> tmp[0] >> trash >> tmp[1] >> trash >> tmp[2]) {
+                // in wavefront obj all indices start at 1, not zero
+                for (int i=0; i<3; i++) tmp[i]--;
+                f.push_back(tmp);
+            }
+            m_faces.push_back(f);
 
         } else if (!line.compare(0, 7, "mtllib ")) {
             // mtllib
@@ -212,17 +213,17 @@ void Model::loadMtllib(const std::string &filename)
         } else if (!line.compare(0, 3, "Ka ")) {
             iss >> trash;
             iss >> tmp[0] >> tmp[1] >> tmp[2];
-            m_mtl[cur_mtl].ambi = vec4f(ftmp, 1.0f);
+            m_mtl[cur_mtl].ambi = vec4f(tmp, 1.0f);
 
         } else if (!line.compare(0, 3, "Kd ")) {
             iss >> trash;
             iss >> tmp[0] >> tmp[1] >> tmp[2];
-            m_mtl[cur_mtl].diff = vec4f(ftmp, 1.0f);
+            m_mtl[cur_mtl].diff = vec4f(tmp, 1.0f);
 
         } else if (!line.compare(0, 3, "Ks ")) {
             iss >> trash;
             iss >> tmp[0] >> tmp[1] >> tmp[2];
-            m_mtl[cur_mtl].spec = vec4f(ftmp, 1.0f);
+            m_mtl[cur_mtl].spec = vec4f(tmp, 1.0f);
 
         } else if (!line.compare(0, 6, "illum ")) {
             iss >> trash;
