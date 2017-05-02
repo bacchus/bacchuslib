@@ -45,61 +45,24 @@ Model::Model(const std::string& filename)
             vec3i tmp;
             iss >> trash;
 
-//            if (line.find("//") != std::string::npos) {
-//                // v//vn case 2: must cope with it
-//                while (iss >> tmp[0] >> trash >> trash >> tmp[2])
-//                    f.push_back(tmp - vec3i(1));
-//                m_faces.push_back(f);
-//            } else
-            /*{
-                std::string token;
-                iss >> token;
-                std::istringstream token_iss(token.c_str());
-
-                int n = 0;
-                std::string::size_type pos = token.find_first_of("/", 0);
-                while (pos != std::string::npos) {
-                    pos = token.find_first_of("/", pos);
-                    ++n;
-                }
-
-                switch (n) {
-                case 0:
-                    token_iss >> tmp[0];
-                    f.push_back(tmp - vec3i(1));
-                    while (iss >> tmp[0])
-                        f.push_back(tmp - vec3i(1));
-                    break;
-
-                case 1:
-                    token_iss >> tmp[0] >> trash >> tmp[1];
-                    f.push_back(tmp - vec3i(1));
-                    while (iss >> tmp[0] >> trash >> tmp[1])
-                        f.push_back(tmp - vec3i(1));
-                    break;
-
-                case 2:
-                    token_iss >> tmp[0] >> trash >> tmp[1] >> trash >> tmp[2];
-                    f.push_back(tmp - vec3i(1));
-                    while (iss >> tmp[0] >> trash >> tmp[1] >> trash >> tmp[2])
-                        f.push_back(tmp - vec3i(1));
-                    break;
-
-                default:
-                    break;
-                }
-
-                m_faces.push_back(f);
-            }*/
-
-
             // BCC: added 'v, v//vn, v/vt, v/vt/vn' variations
-            while (iss >> tmp[0] >> trash >> tmp[1] >> trash >> tmp[2]) {
-                // in wavefront obj all indices start at 1, not zero
-                for (int i=0; i<3; i++) tmp[i]--;
-                f.push_back(tmp);
+            while (!iss.eof()) {
+                iss >> tmp[0];
+                if (iss.peek() == '/') {
+                    iss >> trash;
+                    if (iss.peek() != '/') {
+                        iss >> tmp[1];
+                    }
+                    iss >> trash;
+                    iss >> tmp[2];
+                }
+                f.push_back(tmp - vec3i(1));
             }
             m_faces.push_back(f);
+
+            //            while (iss >> tmp[0] >> trash >> tmp[1] >> trash >> tmp[2])
+            //                f.push_back(tmp - vec3i(1));
+            //            m_faces.push_back(f);
 
         } else if (!line.compare(0, 7, "mtllib ")) {
             // mtllib
