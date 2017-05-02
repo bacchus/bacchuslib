@@ -30,7 +30,7 @@ public:
         id = glCreateShader(m_type);
         CHECK_GL_ERROR();
         const char* c_str = m_source.c_str();
-        CHECK_GL_ERROR(glShaderSource(id, 1, &c_str, NULL));
+        CHECK_GL_ERROR(glShaderSource(id, 1, &c_str, nullptr));
         CHECK_GL_ERROR(glCompileShader(id));
         GLint compiled;
         glGetShaderiv(id, GL_COMPILE_STATUS, &compiled);
@@ -39,7 +39,7 @@ public:
             glGetShaderiv(id, GL_INFO_LOG_LENGTH, &info_len);
             if (info_len > 1) {
                 char* info_log = new char[info_len];
-                glGetShaderInfoLog(id, info_len, NULL, info_log);
+                glGetShaderInfoLog(id, info_len, nullptr, info_log);
                 LOGE("Shader error:\n%s\n", info_log);
                 //LOGE("Shader:\n%s\n", m_source.c_str());
                 std::map<int,int> err_map;

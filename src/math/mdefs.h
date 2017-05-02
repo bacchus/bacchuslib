@@ -33,7 +33,7 @@ typedef unsigned long ulong;// 8B = 64b
 typedef std::complex<float> cplx;
 typedef std::complex<double> cplxd;
 
-inline bool is_power2(uint n) {
+inline bool is_pow2(uint n) {
     return (n&(n-1))==0;
 }
 
@@ -50,7 +50,7 @@ inline float rnd(float max=1.0f) {
 }
 
 inline void rndmz() {
-    srand(time(NULL));
+    srand(time(nullptr));
 }
 
 template<typename T>

@@ -43,7 +43,7 @@ public:
             CHECK_GL_ERROR(glGetProgramiv(id, GL_INFO_LOG_LENGTH, &info_len));
             if (info_len > 1) {
                 char* info_log = new char[info_len];
-                CHECK_GL_ERROR(glGetProgramInfoLog(id, info_len, NULL, info_log));
+                CHECK_GL_ERROR(glGetProgramInfoLog(id, info_len, nullptr, info_log));
                 LOGE("Program error:%s\n", info_log);
                 delete[] info_log;
             }

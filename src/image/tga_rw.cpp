@@ -109,7 +109,7 @@ private:
 bool tga_read_struct::read_tga_file(const char *file_name) {
     if (m_img.dat8)
         delete[] m_img.dat8;
-    m_img.dat8 = NULL;
+    m_img.dat8 = nullptr;
     std::ifstream in;
     in.open (file_name, std::ios::binary);
     if (!in.is_open()) {

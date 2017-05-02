@@ -37,5 +37,5 @@ bool check_reserved_names(const char* str) {
 }
 
 bool check_name(const char* str) {
-    return (str!=NULL) && check_name_common(str) && check_reserved_names(str);
+    return (str!=nullptr) && check_name_common(str) && check_reserved_names(str);
 }

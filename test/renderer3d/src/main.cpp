@@ -42,12 +42,13 @@ public:
         /// opengl specific
         m_tex = new bacchus::Texture(m_img.width, m_img.height, m_img.data());
         m_tex->format(GL_BGR);
+        m_tex->mipmap(true);
 
         m_filter = new bacchus::FilterModel3d(*m_model);
         m_filter->resize(m_width, m_height);
         m_filter->setRatio(m_width/float(m_height));
         m_filter->setInput(m_tex);
-        m_filter->setOutput(NULL);
+        m_filter->setOutput(nullptr);
         m_data = g_start_param;
     }
 
@@ -58,7 +59,7 @@ public:
     }
 
     static int main(int argc, char* argv[]) {
-        srand(time(NULL));
+        srand(time(nullptr));
         QApplication app(argc, argv);
         GLTest widget;
         widget.show();

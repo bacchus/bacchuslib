@@ -29,7 +29,7 @@ FilterModel3d::FilterModel3d(const Model &model)
     , ratio (1.0f)
 {
     pass_0 = new Program(vertSrc.c_str(), fragSrc.c_str());
-    pass_0->set_out(NULL);
+    pass_0->set_out(nullptr);
 
     // add Textures from Model
     // mb Normal Map texture

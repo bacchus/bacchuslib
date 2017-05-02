@@ -70,7 +70,7 @@ struct matx {
 
     matx(): m(0), n(0) {}
 
-    matx(uint h, uint w, const T* idata=NULL): m(h), n(w) {
+    matx(uint h, uint w, const T* idata=nullptr): m(h), n(w) {
         assert(m>0 && n>0);
         if (idata) {
             data.assign(idata, idata + size());
@@ -79,7 +79,7 @@ struct matx {
         }
     }
 
-    explicit matx(uint h, const T* idata=NULL): m(h), n(1) {
+    explicit matx(uint h, const T* idata=nullptr): m(h), n(1) {
         assert(m>0 && n>0);
         if (idata) {
             data.assign(idata, idata + size());

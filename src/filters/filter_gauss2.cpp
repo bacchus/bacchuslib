@@ -50,7 +50,7 @@ Blur::Blur() {
 
     pass_1 = new bacchus::Program(def_vert_src, frag_tex_gbra_src);
     pass_1->set_draw_mode(GL_TRIANGLE_FAN, 4);
-    pass_1->set_out(NULL);
+    pass_1->set_out(nullptr);
     pass_1->vertex("posAttr") = new bacchus::Vertex(qpostex, 4, 2, 4, 0);
     pass_1->vertex("texAttr") = new bacchus::Vertex(qpostex, 4, 2, 4, 2);
     pass_1->parameter("matrix") = &mat;

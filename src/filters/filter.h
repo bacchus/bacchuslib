@@ -57,10 +57,10 @@ public:
 
 protected:
     int width, height;
-    float ratio;
     std::string mVertSrc;
     std::string mFragSrc;
     Program* pass_0;
+    float ratio;
     umat4f mat;
     bool mChanged;
 };

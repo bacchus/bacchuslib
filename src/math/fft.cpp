@@ -18,7 +18,7 @@ matxcx fft_recursive(const matxcx& a, bool rev) {
     if (n==1) {
         return a;
     }
-    assert(is_power2(n));// n must be power of 2
+    assert(is_pow2(n));// n must be power of 2
 
     matxcx y(n);
 
@@ -56,7 +56,7 @@ matxcx fft_slow_gorn(const matxcx& a, bool rev) {
 
 matxcx fft_iterative(const matxcx& a, bool rev) {
     uint n = a.size();
-    assert(is_power2(n));// n must be power of 2
+    assert(is_pow2(n));// n must be power of 2
 
     uint lgn = 0;
     uint tmp = n;
@@ -154,7 +154,7 @@ matxcx convolve(const matxcx &a, const matxcx &b) {
 
 matxcxd fftd(const matxd& a) {
     uint n = a.size();
-    assert(is_power2(n));// n must be power of 2
+    assert(is_pow2(n));// n must be power of 2
     uint lgn = 0;
     uint tmp = n;
     while (tmp >>= 1) {
@@ -183,7 +183,7 @@ matxcxd fftd(const matxd& a) {
 
 matxd revfftd(const matxcxd& a) {
     uint n = a.size();
-    assert(is_power2(n));// n must be power of 2
+    assert(is_pow2(n));// n must be power of 2
     uint lgn = 0;
     uint tmp = n;
     while (tmp >>= 1) {

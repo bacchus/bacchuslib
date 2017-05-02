@@ -128,7 +128,7 @@ private:
 //#include <sys/time.h>
 //double getTimeMsec() {
 //    timeval end;
-//    gettimeofday(&end, NULL);
+//    gettimeofday(&end, nullptr);
 //    return (end.tv_sec - timeMark.tv_sec)*1000.0
 //         + (end.tv_usec - timeMark.tv_usec)/1000.0;
 //}

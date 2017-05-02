@@ -159,9 +159,9 @@ public:
     uint n;
     float* x;
 
-    uvec1fv(): n(0), x(NULL) {}
+    uvec1fv(): n(0), x(nullptr) {}
 
-    uvec1fv(uint nn, const float* data = NULL): n(nn), x(NULL) {
+    uvec1fv(uint nn, const float* data = nullptr): n(nn), x(nullptr) {
         x = new float[n];
         if (data) {
             memcpy(x, data, n*sizeof(float));
@@ -174,7 +174,7 @@ public:
         if (x) delete[] x;
     }
 
-    void set(uint nn, const float* data = NULL) {
+    void set(uint nn, const float* data = nullptr) {
         if (n != nn) {
             n = nn;
             if (x) delete[] x;

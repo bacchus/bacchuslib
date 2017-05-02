@@ -37,10 +37,10 @@ struct Image {
     uchar* data() { return dat8; }
     const uchar* data() const { return dat8; }
 
-    Image(): width(0), height(0), bytespp(FMT_RGBA), format(FMT_RGBA), dat8(NULL) { }
+    Image(): width(0), height(0), bytespp(FMT_RGBA), format(FMT_RGBA), dat8(nullptr) { }
 
-    Image(uint w, uint h, const uchar* idata=NULL)
-        : width(w), height(h), bytespp(FMT_RGBA), format(FMT_RGBA), dat8(NULL)
+    Image(uint w, uint h, const uchar* idata=nullptr)
+        : width(w), height(h), bytespp(FMT_RGBA), format(FMT_RGBA), dat8(nullptr)
     {
         assert(width>0 && height>0);
         dat8 = new uchar[memsize()];
@@ -52,7 +52,7 @@ struct Image {
     }
 
     Image(const Image& img)
-        : width(img.width), height(img.height), bytespp(img.bytespp), format(img.format), dat8(NULL)
+        : width(img.width), height(img.height), bytespp(img.bytespp), format(img.format), dat8(nullptr)
     {
         assert(width>0 && height>0);// no copy 0x0 data
         dat8 = new uchar[memsize()];

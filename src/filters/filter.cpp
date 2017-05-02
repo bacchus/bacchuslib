@@ -7,12 +7,12 @@ namespace bacchus {
 Filter::Filter(const std::string& vert, const std::string& frag)
     : mVertSrc(vert)
     , mFragSrc(frag)
-    , mChanged(true)
     , ratio (1.0f)
+    , mChanged(true)
 {
     pass_0 = new Program(mVertSrc.c_str(), mFragSrc.c_str());
     pass_0->set_draw_mode(GL_TRIANGLE_FAN, 4);
-    pass_0->set_out(NULL);
+    pass_0->set_out(nullptr);
     pass_0->vertex("posAttr") = new Vertex(gPosTex, 4, 2, 4, 0);
     pass_0->vertex("texAttr") = new Vertex(gPosTex, 4, 2, 4, 2);
     pass_0->parameter("matrix") = &mat;

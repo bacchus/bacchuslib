@@ -113,7 +113,7 @@ static void makepng_warning(png_structp png_ptr, png_const_charp message) {
     const char **ep = (const char **)png_get_error_ptr(png_ptr);
     const char *name;
 
-    if (ep != NULL && *ep != NULL)
+    if (ep != nullptr && *ep != nullptr)
         name = *ep;
 
     else
@@ -126,7 +126,7 @@ static void makepng_error(png_structp png_ptr, png_const_charp message) {
     const char **ep = (const char **)png_get_error_ptr(png_ptr);
     const char *name;
 
-    if (ep != NULL && *ep != NULL)
+    if (ep != nullptr && *ep != nullptr)
         name = *ep;
 
     else
