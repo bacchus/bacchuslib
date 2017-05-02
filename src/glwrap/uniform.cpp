@@ -20,7 +20,7 @@ void Uniform::value(const uvec4f& val) {
 }
 
 void Uniform::value(const umat4f& val) {
-    valueM4(val.data());
+    valueM4(&val[0][0]);//.data()
 }
 
 void Uniform::value(const uvec1fv& val) {

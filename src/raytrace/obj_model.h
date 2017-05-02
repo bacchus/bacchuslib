@@ -67,6 +67,10 @@ public:
     const float* tex_ptr() const { return &m_mesh[0].tex.x; }
     const float* nrm_ptr() const { return &m_mesh[0].nrm.x; }
 
+    vec3f center() const { return m_center; }
+    vec3f size() const { return m_size; }
+    float radius() const { return m_radius; }
+
 private:
     void loadMtllib(const std::string& filename);
     void calcBounds();

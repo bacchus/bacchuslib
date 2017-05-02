@@ -121,8 +121,8 @@ Model::Model(const std::string& filename)
     //load_texture(filename, "_nm_tangent.tga",      normalmap_);
     //load_texture(filename, "_spec.tga",    specularmap_);
 
-    //    buildMeches();
-    //    calcBounds();
+    calcBounds();
+    buildMeshes();
     //    genNorms();
     //    genTangs();
 }

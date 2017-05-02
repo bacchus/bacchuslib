@@ -10,6 +10,7 @@
 #include "math/vec2.h"
 #include "math/vec3.h"
 #include "math/vec4.h"
+#include "math/mat4.h"
 
 namespace bacchus {
 
@@ -54,6 +55,26 @@ public:
     virtual void set_uniform(Uniform* u) { u->value(*this); }
 };
 
+class umat4f: public Value, public mat4f {
+public:
+
+    umat4f() {
+        one();
+    }
+
+    umat4f(const mat4f& m)
+        : mat4f(m)
+    {}
+
+    virtual void set_uniform(Uniform* u) { u->value(*this); }
+
+    void set_scale(float x, float y) {
+        data[0][0] = x;
+        data[1][1] = y;
+    }
+};
+
+/*
 class umat4f: public Value {
 private:
     float m[16];
@@ -130,6 +151,8 @@ public:
 
     virtual void set_uniform(Uniform* u) { u->value(*this); }
 };
+*/
+
 
 class uvec1fv: public Value {
 public:
