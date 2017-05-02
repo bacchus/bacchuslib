@@ -61,6 +61,9 @@ public:
     }
 
     Uniform* uniform(const std::string& name) {
+        // glGetUniformLocation can be done right after link
+        // and cashed to m_uniforms
+        // but I do it only first time so its ok
         if (m_uniforms.find(name) == m_uniforms.end()) {
             int location;
             CHECK_GL_ERROR(location = glGetUniformLocation(id, name.c_str()));
