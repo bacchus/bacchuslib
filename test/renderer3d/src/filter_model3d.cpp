@@ -11,7 +11,7 @@ static std::string vertSrc =
         "varying vec2 tex;\n"
         "uniform mat4 matrix;\n"
         "void main() {\n"
-        "   tex = texAttr;\n"
+        "   tex = vec2(1.0 - texAttr.x,1.0 - texAttr.y);\n"
         "   gl_Position = matrix * vec4(posAttr, 1.0);\n"
         "}\n";
 
@@ -32,10 +32,11 @@ FilterModel3d::FilterModel3d(const Model &model)
     pass_0->set_out(NULL);
 
     // add Textures from Model
+    // mb Normal Map texture
 
-    pass_0->vertex("posAttr") = new Vertex(m_model.pos_ptr(), m_model.vertex_count(), 3, 8, 0);
-    pass_0->vertex("texAttr") = new Vertex(m_model.pos_ptr(), m_model.vertex_count(), 2, 8, 3);
-    pass_0->set_draw_mode(GL_TRIANGLES, m_model.vertex_count());
+    pass_0->vertex("posAttr") = new Vertex(m_model.mesh(), m_model.mesh_size(), 3, 8, 0);
+    pass_0->vertex("texAttr") = new Vertex(m_model.mesh(), m_model.mesh_size(), 2, 8, 3);
+    pass_0->set_draw_mode(GL_TRIANGLES, m_model.mesh_size());
 
     pass_0->parameter("matrix") = &mat;
 
@@ -58,22 +59,19 @@ void FilterModel3d::onInit() {
 }
 
 void FilterModel3d::onRender() {
-//    CHECK_GL_ERROR(glEnable(GL_CULL_FACE));
-//    if (reflect) {
-//        CHECK_GL_ERROR(glCullFace(GL_FRONT));
-//    } else {
-//        CHECK_GL_ERROR(glCullFace(GL_BACK));
-//    }
+    CHECK_GL_ERROR(glEnable(GL_CULL_FACE));
+    CHECK_GL_ERROR(glCullFace(GL_BACK));
+//    CHECK_GL_ERROR(glCullFace(GL_FRONT));
+
 //    CHECK_GL_ERROR(glEnable(GL_DEPTH_TEST));
 //    CHECK_GL_ERROR(glDepthFunc(GL_LESS));
-//    if (blend || m_model.transparent()) {
-//        CHECK_GL_ERROR(glEnable(GL_BLEND));
-//        CHECK_GL_ERROR(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
-//        //CHECK_GL_ERROR(glDepthMask(GL_FALSE));//TODO: check this
-//    } else {
-//        CHECK_GL_ERROR(glDisable(GL_BLEND));
-//        CHECK_GL_ERROR(glDepthMask(GL_TRUE));
-//    }
+
+//    CHECK_GL_ERROR(glEnable(GL_BLEND));
+//    CHECK_GL_ERROR(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+//    CHECK_GL_ERROR(glDepthMask(GL_FALSE));
+
+//    CHECK_GL_ERROR(glDisable(GL_BLEND));
+//    CHECK_GL_ERROR(glDepthMask(GL_TRUE));
 }
 
 void FilterModel3d::resize(int w, int h) {

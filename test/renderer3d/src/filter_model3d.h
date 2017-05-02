@@ -39,10 +39,6 @@ protected:
     Program* pass_0;
     umat4f mat;
     bool mChanged;
-
-    // ctx
-    bool reflect = false;
-    bool blend = false;
 };
 
 } // namespace bacchus

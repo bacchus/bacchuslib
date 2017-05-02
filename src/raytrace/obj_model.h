@@ -59,13 +59,9 @@ public:
     //float specular(vec2f uv);
     //vec3f normal(vec2f uv);
 
-    //TODO: this is material quality
-    bool transparent() const { return false; }
     // TODO: here faces must be triangles
-    int vertex_count() const { return m_mesh.size(); }
-    const float* pos_ptr() const { return &m_mesh[0].pos.x; }
-    const float* tex_ptr() const { return &m_mesh[0].tex.x; }
-    const float* nrm_ptr() const { return &m_mesh[0].nrm.x; }
+    int mesh_size() const { return m_mesh.size(); }
+    const float* mesh() const { return &m_mesh[0].pos.x; }
 
     vec3f center() const { return m_center; }
     vec3f size() const { return m_size; }
@@ -77,7 +73,7 @@ private:
     void buildMeshes();
 
 private:
-    std::vector< std::vector<vec3i> > m_faces; // vertex/uv/normal
+    std::vector< std::vector<vec3i> > m_faces;
     std::vector<vec3f> m_verts;
     std::vector<vec2f> m_uv;
     std::vector<vec3f> m_norms;

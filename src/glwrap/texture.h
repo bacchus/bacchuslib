@@ -33,6 +33,7 @@ public:
     Texture()
         : m_width(0)
         , m_height(0)
+        , m_format(GL_RGBA)
         , m_pixels(NULL)
     {}
 
@@ -40,12 +41,14 @@ public:
         : id(glid)
         , m_width(w)
         , m_height(h)
+        , m_format(GL_RGBA)
         , m_pixels(NULL)
     {}
 
     Texture(uint w, uint h, uchar* pixels = NULL)
         : m_width(w)
         , m_height(h)
+        , m_format(GL_RGBA)
         , m_pixels(pixels)
     {}
 
@@ -75,6 +78,10 @@ public:
         unbind();
     }
 
+    void format(uint fmt = GL_RGBA) {
+        m_format = fmt;
+    }
+
     void destroyGl() {
         CHECK_GL_ERROR(glDeleteTextures(1, &id));
     }
@@ -88,7 +95,7 @@ public:
 
     void pixels() {
         bind();
-        CHECK_GL_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_pixels));
+        CHECK_GL_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, m_format, GL_UNSIGNED_BYTE, m_pixels));
         unbind();
     }
 
@@ -103,6 +110,7 @@ private:
     uint id;
     uint m_width;
     uint m_height;
+    uint m_format;
     uchar* m_pixels;
 
     friend inline uint getId(const Texture& tex);

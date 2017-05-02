@@ -27,7 +27,8 @@ public:
     {
         LOGD("Hello kittie!");
 
-        bacchus::read_tga_mirrored("../res/diffuse.tga", m_img);
+        bacchus::read_tga("../res/diffuse.tga", m_img);
+        //bacchus::read_png_mirrored("../res/test.png", m_img);
         m_model = new bacchus::Model("../res/model.obj");
 
         /// setup qt window
@@ -40,6 +41,7 @@ public:
 
         /// opengl specific
         m_tex = new bacchus::Texture(m_img.width, m_img.height, m_img.data());
+        m_tex->format(GL_BGR);
 
         m_filter = new bacchus::FilterModel3d(*m_model);
         m_filter->resize(m_width, m_height);
