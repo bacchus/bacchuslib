@@ -37,6 +37,7 @@ public:
         /// opengl specific
         m_tex = new bacchus::Texture(m_img.width, m_img.height, m_img.data());
         m_filter = new bacchus::FilterSimple();
+        m_filter->setRatio(m_width/(float)m_height);
         m_filter->resize(m_width, m_height);
         m_filter->setInput(m_tex);
         m_filter->setOutput(NULL);

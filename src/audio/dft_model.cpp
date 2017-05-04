@@ -35,7 +35,7 @@ matxd genPhaseSpec_fromdftd(const matxcxd &y) {
 }
 
 void dftAnald(const matxd& x, const matxd& w, uint N, matxd& mX, matxd& pX) {
-    assert(is_power2(N)); // raise error if N not a power of two
+    assert(is_pow2(N)); // raise error if N not a power of two
     assert(w.size() <= N); // raise error if window size bigger than fft size
     assert(x.size() == w.size()); // raise error if window size not same as sample size
     int hN = (N/2)+1; // size of positive spectrum, it includes sample 0
@@ -55,7 +55,7 @@ void dftAnald(const matxd& x, const matxd& w, uint N, matxd& mX, matxd& pX) {
 matxd dftSynthd(const matxd& mX, const matxd& pX, uint M) {
     uint hN = mX.size(); // size of positive spectrum, it includes sample 0
     uint N = (hN-1)*2; // FFT size
-    assert(is_power2(N)); // raise error if N not a power of two, thus mX is wrong
+    assert(is_pow2(N)); // raise error if N not a power of two, thus mX is wrong
     uint hM1 = int(std::floor((M+1)/2)); // half analysis window size by rounding
     uint hM2 = int(std::floor(M/2)); // half analysis window size by floor
     matxcxd Y(N); // clean output spectrum

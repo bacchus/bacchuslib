@@ -53,7 +53,7 @@ class GLTest: public QGLWidget {
 public:
 
     /// raytracing
-    vec3f eye = vec3f(2,0,5);
+    vec3f eye = vec3f(-1,-1,20);
     vec3f tar = vec3f(0,0,0);
     float rts = 0.5f;
     Raytracer* m_tracer;

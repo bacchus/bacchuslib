@@ -149,7 +149,7 @@ matxf hamming(int N) {
 }
 
 void dftAnal(const matxf& x, const matxf& w, uint N, matxf& mX, matxf& pX) {
-    assert(is_power2(N));   // raise error if N not a power of two
+    assert(is_pow2(N));   // raise error if N not a power of two
     assert(w.size() <= N);  // raise error if window size bigger than fft size
     assert(x.size() == w.size());
     int hN = (N/2)+1;                           // size of positive spectrum, it includes sample 0
@@ -172,7 +172,7 @@ void dftAnal(const matxf& x, const matxf& w, uint N, matxf& mX, matxf& pX) {
 matxf dftSynth(const matxf& mX, const matxf& pX, uint M) {
     uint hN = mX.size();                        // size of positive spectrum, it includes sample 0
     uint N = (hN-1)*2;                          // FFT size
-    assert(is_power2(N));                       // raise error if N not a power of two, thus mX is wrong
+    assert(is_pow2(N));                       // raise error if N not a power of two, thus mX is wrong
     uint hM1 = int(std::floor((M+1)/2));        // half analysis window size by rounding
     uint hM2 = int(std::floor(M/2));            // half analysis window size by floor
     matxcx Y(N);                                // clean output spectrum
