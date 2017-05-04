@@ -157,6 +157,7 @@ public:
         setupParameters();
         enableVertexes();
         CHECK_GL_ERROR(glDrawArrays(m_mode, 0, m_vertex_count));
+        //for glBuffer: CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0));
         disableVertexes();
 
         if (m_out) m_out->unbind();

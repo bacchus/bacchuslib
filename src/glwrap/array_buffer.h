@@ -4,15 +4,16 @@
 
 namespace bacchus {
 
+template<uint TARGET>
 class ArrayBuffer {
 public:
 
     static void bind(uint glid) {
-        CHECK_GL_ERROR(glBindBuffer(GL_ARRAY_BUFFER, glid));
+        CHECK_GL_ERROR(glBindBuffer(TARGET, glid));
     }
 
     static void unbind() {
-        CHECK_GL_ERROR(glBindBuffer(GL_ARRAY_BUFFER, 0));
+        CHECK_GL_ERROR(glBindBuffer(TARGET, 0));
     }
 
     ArrayBuffer()
@@ -50,7 +51,7 @@ public:
 
     void load() {
         bind();
-        CHECK_GL_ERROR(glBufferData(GL_ARRAY_BUFFER, m_size, m_data, GL_STATIC_DRAW));
+        CHECK_GL_ERROR(glBufferData(TARGET, m_size, m_data, GL_STATIC_DRAW));
         unbind();
     }
 
@@ -62,8 +63,12 @@ private:
     friend inline uint getId(const ArrayBuffer& ab);
 };
 
-inline uint getId(const ArrayBuffer& ab) {
+template<uint TARGET>
+inline uint getId(const ArrayBuffer<TARGET>& ab) {
     return ab.id;
 }
+
+typedef ArrayBuffer<GL_ARRAY_BUFFER> VertBuffer;
+typedef ArrayBuffer<GL_ELEMENT_ARRAY_BUFFER> IndxBuffer;
 
 }
