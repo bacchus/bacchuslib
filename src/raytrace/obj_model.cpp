@@ -12,7 +12,7 @@ Model::Model(const std::string& filename)
     in.open(filename, std::ifstream::in);
     if (in.fail()) return;
     std::string line;
-    int cur_mtl = 0;
+    //int cur_mtl = 0;
 
     while (!in.eof()) {
         std::getline(in, line);
@@ -74,9 +74,9 @@ Model::Model(const std::string& filename)
 
         } else if (!line.compare(0, 7, "usemtl ")) {
             // usemtl
-            std::string name = line.substr(7);
-            cur_mtl = (m_mtl_cache.find(name) == m_mtl_cache.end()
-                       ? 0 : m_mtl_cache[name]);
+//            std::string name = line.substr(7);
+//            cur_mtl = (m_mtl_cache.find(name) == m_mtl_cache.end()
+//                       ? 0 : m_mtl_cache[name]);
         }
     }
     //std::cout << "# v# " << m_verts.size() << " f# "  << m_faces.size() << " vt# " << m_uv.size() << " vn# " << m_norms.size() << std::endl;
@@ -207,7 +207,7 @@ void Model::calcBounds()
     vec3f vmin = m_verts[0];
     vec3f vmax = vmin;
 
-    for (int i = 1; i < m_verts.size(); ++i) {
+    for (uint i = 1; i < m_verts.size(); ++i) {
         vec3f v = m_verts[i];
         vmin = min(vmin, v);
         vmax = max(vmax, v);

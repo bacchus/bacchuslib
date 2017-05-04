@@ -176,7 +176,8 @@ inline int max3i(T a, T b, T c) {
     return ( a > (b>c?b:c) ) ? 0 : ( b>c?1:2 );
 }
 
-inline float clamp(float c, float minval, float maxval) {
+template <typename T>
+inline T clamp(T c, T minval = T(0), T maxval = T(1)) {
     return std::max(std::min(c, maxval), minval);
 }
 

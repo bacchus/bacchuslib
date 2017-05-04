@@ -9,6 +9,7 @@
 #include "image/png_rw.h"
 #include "filters/filter_simple.h"
 #include "glwrap/program.h"
+#include "image/geometric.h"
 
 const float g_start_param = 1.0f;
 const float g_delta_param = 0.1f;
@@ -16,6 +17,8 @@ const float g_min_param = 0.0f;
 const float g_max_param = 1.0f;
 
 using namespace bacchus;
+
+int mainImage(Image& img, int samps);
 
 class GLTest: public QGLWidget {
 public:
@@ -25,6 +28,9 @@ public:
         LOGD("Hello kittie!");
 
         bacchus::read_png_mirrored("../img/test.png", m_img);
+
+        mainImage(m_img, 8);
+        Geometric::flip_vert(m_img, m_img);
 
         /// setup qt window
         setWindowTitle("Hello kittie");

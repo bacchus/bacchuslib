@@ -15,6 +15,7 @@ CCFLAG +=  -Wno-pointer-to-int-cast
 BCC_DIR = ../../src
 
 SOURCES += \
+    src/smallpt.cpp \
     src/main.cpp \
     $$BCC_DIR/audio/*.cpp \
     $$BCC_DIR/cvml/*.cpp \

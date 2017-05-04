@@ -78,6 +78,12 @@ struct vec2 {
 };
 
 template <typename T>
+inline vec2<T> sqrtv(const vec2<T>& v) {
+    return vec2<T>(sqrt(v.x),
+                   sqrt(v.y));
+}
+
+template <typename T>
 inline T length(const vec2<T>& v1) {
     return sqrt(sq(v1.x) +
                 sq(v1.y));
@@ -226,5 +232,65 @@ inline vec2i mod(const vec2i& v1, const vec2i& v2) {
 inline vec2i mod(const vec2i& v1, int c) {
     return mod(v1, vec2i(c));
 }
+
+/// ================ VEC2 BOOL LIES HERE ================
+typedef vec2<bool> bvec2;
+
+inline bool any(const bvec2& bv1) {
+    return (bv1.x ||
+            bv1.y);
+}
+
+inline bool all(const bvec2& bv1) {
+    return (bv1.x &&
+            bv1.y);
+}
+
+inline bvec2 operator not(const bvec2& bv1) {
+    return bvec2(!bv1.x,
+                 !bv1.y);
+}
+
+template <typename T>
+inline bool gt(const vec2<T>& v1, const vec2<T>& v2) {
+    return  gt(v1.x,v2.x) &&
+            gt(v1.y,v2.y);
+}
+
+//template <typename T>
+//inline bool gt(const vec2<T>& v1, T c) {
+//    return gt(v1, vec2<T>(c));
+//}
+
+//template <typename T>
+//inline bool gt(T c, const vec2<T>& v2) {
+//    return gt(vec2<T>(c), v2);
+//}
+
+template <typename T>
+inline bvec2 gtv(const vec2<T>& v1, const vec2<T>& v2) {
+    return bvec2(v1.x > v2.x,
+                 v1.y > v2.y);
+}
+
+template <typename T>
+inline bvec2 eqv(const vec2<T>& v1, const vec2<T>& v2) {
+    return bvec2(eq(v1.x,v2.x),
+                 eq(v1.y,v2.y));
+}
+
+//template <typename T>
+//inline bvec2 neqv(const vec2<T>& v1, const vec2<T>& v2) {
+//    return bvec2(!eq(v1.x,v2.x),
+//                 !eq(v1.y,v2.y));
+//}
+
+template <typename T>
+inline vec2<T> ifv(const bvec2& condv, const vec2<T>& v1, const vec2<T>& v2) {
+    return vec2<T>(condv.x ? v1.x : v2.x,
+                   condv.y ? v1.y : v2.y);
+}
+
+/// =====================================================
 
 } // namespace bacchus
