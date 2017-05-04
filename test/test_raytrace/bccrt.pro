@@ -13,20 +13,20 @@ CCFLAG +=  -Wno-pointer-to-int-cast
 #-std=c++0x -fpermissive -Wno-permissive
 
 SOURCES += \
-    main.cpp \
     ../../src/filters/*.cpp \
     ../../src/glwrap/*.cpp \
     ../../src/image/*.cpp \
     ../../src/math/*.cpp \
-    ../../src/utils/*.cpp
+    ../../src/utils/*.cpp \
+    src/main.cpp
 
 HEADERS += \
-    *.h \
     ../../src/filters/*.h \
     ../../src/glwrap/*.h \
     ../../src/image/*.h \
     ../../src/math/*.h \
-    ../../src/utils/*.h
+    ../../src/utils/*.h \
+    src/bcctrace.h
 
 INCLUDEPATH += \
     ../../3rdparty \

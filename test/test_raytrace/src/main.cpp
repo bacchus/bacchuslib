@@ -27,8 +27,8 @@ public:
         LOGD("Hello kittie!");
 
         //bacchus::read_png_mirrored("test.png", m_img);
-        m_img = Image(200,200);
-        process(m_img);
+        m_img = Image(300,300);
+        process_scene(m_img);
 //        Engine e;
 //        e.prims.push_back(new Plane(vec3f(0.7f,0.7f,0.7f)));
 //        e.prims.push_back(new Sphere(vec3f(0.7f,0.5f,0.2f), vec3f(0,0.25,0), 0.25f));
@@ -47,7 +47,7 @@ public:
         m_filter = new bacchus::FilterSimple();
         m_filter->resize(m_width, m_height);
         m_filter->setInput(m_tex);
-        m_filter->setOutput(NULL);
+        m_filter->setOutput(nullptr);
         m_data = g_start_param;
     }
 
@@ -56,7 +56,7 @@ public:
     }
 
     static int main(int argc, char* argv[]) {
-        srand(time(NULL));
+        srand(time(nullptr));
         QApplication app(argc, argv);
         GLTest widget;
         widget.show();
