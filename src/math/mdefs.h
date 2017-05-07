@@ -65,7 +65,7 @@ inline bool eq<int>(const int& a, const int& b) {
 
 template<>
 inline bool eq<float>(const float& a, const float& b) {
-    if (std::abs(a - b) < BCC_M_FLOAT_EPSILON)
+    if (std::fabs(a - b) < BCC_M_FLOAT_EPSILON)
         return true;
     const int maxUlps = 1024;
     assert(maxUlps > 0 && maxUlps < 4*1024*1024);
@@ -79,7 +79,7 @@ inline bool eq<float>(const float& a, const float& b) {
 
 template<>
 inline bool eq<double>(const double& a, const double& b) {
-    return std::abs(a - b) < BCC_M_DOUBLE_EPSILON;
+    return std::fabs(a - b) < BCC_M_DOUBLE_EPSILON;
 }
 
 template<>
@@ -95,10 +95,10 @@ inline bool eq<cplxd>(const cplxd& a, const cplxd& b) {
 }
 
 inline int ulp_difference(const float& a, const float& b, float epsilon) {
-    if (std::abs(a - b) < epsilon)
+    if (std::fabs(a - b) < epsilon)
         return -1;
 
-//    if (a*b>0.f && std::abs(a - b)/std::abs(a + b) < 0.01)
+//    if (a*b>0.f && std::fabs(a - b)/std::fabs(a + b) < 0.01)
 //        return -2;
 
     int aint = *(int*)&a;
@@ -110,10 +110,10 @@ inline int ulp_difference(const float& a, const float& b, float epsilon) {
 }
 
 inline int ulp_difference(const double& a, const double& b, double epsilon) {
-    if (std::abs(a - b) < epsilon)
+    if (std::fabs(a - b) < epsilon)
         return -1;
 
-//    if (a*b>0.f && std::abs(a - b)/std::abs(a + b) < 0.01)
+//    if (a*b>0.f && std::fabs(a - b)/std::fabs(a + b) < 0.01)
 //        return -2;
 
     int aint = *(int*)&a;

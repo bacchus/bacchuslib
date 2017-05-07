@@ -40,10 +40,10 @@ FilterModel3d::FilterModel3d(const Model &model)
 
     pass_0->parameter("matrix") = &mat;
 
-//    mat = viewport(0,0,width,height,1);
+    //mat = viewport(0,0,width,height,1);
     mat = lookat(m_model.center() + 2.0f*m_model.radius()*vec3f(0,0,1)
                          , m_model.center(), vec3f(0,1,0));
-    mat.set_scale (1.0f, 1.0f);
+    //mat.set_scale (1.0f, 1.0f);
 }
 
 FilterModel3d::~FilterModel3d() {
@@ -78,7 +78,7 @@ void FilterModel3d::resize(int w, int h) {
     onResize(w,h);
     width = w;
     height = h;
-    w>h ? mat.set_scale(ratio*h/float(w), 1.0f) : mat.set_scale(1.0f, w/float(ratio*h));
+    //w>h ? mat.set_scale(ratio*h/float(w), 1.0f) : mat.set_scale(1.0f, w/float(ratio*h));
     pass_0->set_out_size(w, h);
     mChanged = true;
 }
@@ -116,6 +116,11 @@ void FilterModel3d::setOutput(FrameBufferTexture* outFbt) {
 
 void FilterModel3d::setRatio(float new_ratio) {
     ratio = new_ratio;
+}
+
+void FilterModel3d::setMat(const mat4f& new_mat) {
+    mat = new_mat;
+    mChanged = true;
 }
 
 } // namespace bacchus

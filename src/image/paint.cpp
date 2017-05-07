@@ -114,7 +114,7 @@ void Paint::draw_fractal_mandelbrot() {
             cplx z;
             int k;
             for (k = 0; k < n; ++k) {
-                if (std::abs(z) > 2)
+                if (std::fabs(z) > 2)
                     break;
                 cplx p(xi+(x+0.5f)*(xa-xi)/width, ya-(y+0.5f)*(ya-yi)/height);
                 z = z*z + p;

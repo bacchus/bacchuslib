@@ -31,6 +31,7 @@ public:
 
     void setChanged() { mChanged = true; }
     void setRatio(float new_ratio); // w/h
+    void setMat(const mat4f& new_mat);
 
 protected:
     const Model& m_model;

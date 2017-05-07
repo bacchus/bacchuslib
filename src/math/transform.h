@@ -51,4 +51,42 @@ inline mat4f projection(float coef) {
     return res;
 }
 
+inline mat4f perspective(float fov_deg, float ratio, float znear, float zfar) {
+    mat4f res;
+    float f = 1.0f/std::tan(0.5f*deg2rad(fov_deg));
+
+    res[0][0] = f/ratio;
+    res[1][1] = f;
+    res[2][2] = (znear + zfar)/(znear - zfar);
+    res[3][2] = -1.0f;
+    res[2][3] = 2.0f*znear*zfar/(znear - zfar);
+    res[3][3] = 0.0f;
+
+    return res;
+}
+
+//angle in deg
+inline mat4f rotate(const vec3f& axis, float angle_deg) {
+    const float angle = deg2rad(angle_deg);
+    const float s = std::sin(angle);
+    const float c = std::cos(angle);
+    const vec3f ax = normalize(axis);
+
+    mat4f res;
+    res[3][3] = 1.0f;
+
+    for (int i = 0; i < 3; ++i) {
+        res[(i+1)%3][i] =  s*ax[(i+2)%3];
+        res[(i+2)%3][i] = -s*ax[(i+1)%3];
+    }
+
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            res[j][i] += (1.0f - c)*ax[i]*ax[j] + (i==j ? c : 0.0f);
+        }
+    }
+
+    return res;
+}
+
 } // namespace bacchus

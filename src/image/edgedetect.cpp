@@ -63,7 +63,7 @@ Image& Edgedetect::sobel_2wrap(Image& out, const Image& img1) {
     }
 
     //out.pix(j,i) = lum2i(sqrt(g1*g1+g2*g2));
-    //pix(j,i) = lum2i(abs(atan2(g1,g2))*255.0f/M_PI);
+    //pix(j,i) = lum2i(std::abs(atan2(g1,g2))*255.0f/M_PI);
     //pix(j,i) = lum2i(127.5f + 127.5f*atan2(g1,g2)/M_PI);
 
     return out;
@@ -83,7 +83,7 @@ Image& Edgedetect::sobel(Image& out, const Image& img1) {
                     -img1.lum(j-1,i-1) - 2*img1.lum(j,i-1) - img1.lum(j+1,i-1);
 
             out.pix(j,i) = lum2i(clamp_color( sqrt(g1*g1+g2*g2) ));
-            //pix(j,i) = lum2i(abs(atan2(g1,g2))*128.0f/M_PI);
+            //pix(j,i) = lum2i(std::abs(atan2(g1,g2))*128.0f/M_PI);
         }
     }
 

@@ -158,8 +158,8 @@ inline vec2<T> operator-(const vec2<T>& v) {
 
 template <typename T>
 inline vec2<T> abs(const vec2<T>& v1) {
-    return vec2<T>(std::abs(v1.x),
-                   std::abs(v1.y));
+    return vec2<T>(std::fabs(v1.x),
+                   std::fabs(v1.y));
 }
 
 template <typename T>

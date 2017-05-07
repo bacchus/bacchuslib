@@ -31,7 +31,7 @@ std::vector< matxcx > Fourier::transform(Image& mag, Image& arg, float& ymin, fl
     for (int y = 0; y < height; ++y) {
         for (int x = 0; x < width; ++x) {
             //float val = yimg[y][x].mag();
-            float val = std::abs(yimg[y][x]);
+            float val = std::fabs(yimg[y][x]);
             if (val < ymin) ymin = val;
             if (val > ymax) ymax = val;
         }
@@ -43,10 +43,10 @@ std::vector< matxcx > Fourier::transform(Image& mag, Image& arg, float& ymin, fl
         for (int x = 0; x < width; ++x) {
 //                int i = (y + height/2) % height;
 //                int j = (x + width/2) % width;
-            //float mag = clamp_color(std::abs(yimg[y][x].mag()));
+            //float mag = clamp_color(std::fabs(yimg[y][x].mag()));
 //            float ymag = 255.0f*(yimg[y][x].mag() - ymin)/(ymax - ymin);
 //            float yarg = 255.0f*(yimg[y][x].arg() + M_PI)/(2.0f*M_PI);
-            float ymag = 255.0f*(std::abs(yimg[y][x]) - ymin)/(ymax - ymin);
+            float ymag = 255.0f*(std::fabs(yimg[y][x]) - ymin)/(ymax - ymin);
             float yarg = 255.0f*(std::arg(yimg[y][x]) + M_PI)/(2.0f*M_PI);
 
             mag.pix(x,y) = lum2i(ymag);// xz

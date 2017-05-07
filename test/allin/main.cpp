@@ -418,7 +418,7 @@ public:
     void increase_t(int) {
         m_t += 0.01f;
         Paint paint(m_oimg[0]);
-        paint.draw_perlin_noise(m_t);
+        paint.draw_perlin_noise(10, m_t);
         m_tex->pixels(m_img.width, m_img.height, m_oimg[curoimg].dat8);
         m_filter->setChanged();
     }

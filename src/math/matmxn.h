@@ -667,7 +667,7 @@ inline std::vector<int> argsort(const matx<T>& v) {
 
 template<typename T>
 inline matx<T> abs(const matx<T> &mat) {
-    return mat.transform([](const T& x){ return std::abs(x);});
+    return mat.transform([](const T& x){ return std::fabs(x);});
 }
 
 typedef matx<double> matxd;

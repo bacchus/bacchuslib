@@ -12,6 +12,7 @@
 #include "glwrap/program.h"
 #include "raytrace/obj_model.h"
 #include "filter_model3d.h"
+#include "math/transform.h"
 
 const float g_start_param = 1.0f;
 const float g_delta_param = 0.1f;
@@ -44,9 +45,15 @@ public:
         m_tex->format(GL_BGR);
         m_tex->mipmap(true);
 
+
         m_filter = new bacchus::FilterModel3d(*m_model);
         m_filter->resize(m_width, m_height);
         m_filter->setRatio(m_width/float(m_height));
+
+        cam_tar = m_model->center();
+        cam_pos = cam_tar + 2.0f*m_model->radius()*vec3f(0,0,1);
+        updateCam();
+
         m_filter->setInput(m_tex);
         m_filter->setOutput(nullptr);
         m_data = g_start_param;
@@ -70,10 +77,76 @@ public:
     std::map<int, on_key> key_press = {
         {Qt::Key_Escape, &GLTest::exit_program},
         {Qt::Key_Left, &GLTest::less},
-        {Qt::Key_Right, &GLTest::more}
+        {Qt::Key_Right, &GLTest::more},
+
+        {Qt::Key_A, &GLTest::move_l},
+        {Qt::Key_D, &GLTest::move_r},
+        {Qt::Key_W, &GLTest::move_u},
+        {Qt::Key_S, &GLTest::move_d},
+        {Qt::Key_Q, &GLTest::move_f},
+        {Qt::Key_E, &GLTest::move_b},
     };
 
     void exit_program(int) { close(); }
+
+    void move_l(int) {
+        vec3f cam_dir = normalize(cam_pos - cam_tar);
+        vec3f right = normalize(cross(cam_dir, vec3f(0,1,0)));
+        cam_pos += rts*right;
+        updateCam();
+    }
+
+    void move_r(int) {
+        vec3f cam_dir = normalize(cam_pos - cam_tar);
+        vec3f right = normalize(cross(cam_dir, vec3f(0,1,0)));
+        cam_pos -= rts*right;
+        updateCam();
+    }
+
+    void move_u(int) {
+        vec3f cam_dir = normalize(cam_pos - cam_tar);
+        vec3f right = normalize(cross(cam_dir, vec3f(0,1,0)));
+        vec3f cam_up = normalize(cross(right, cam_dir));
+
+        vec3f new_pos = cam_pos + cam_up;
+        vec3f new_dir = normalize(new_pos - cam_tar);
+        float new_cos = dot(new_dir, vec3f(0,1,0));
+        if (std::fabs(new_cos) < 0.9f) {
+            cam_pos = new_pos;
+            updateCam();
+        }
+    }
+
+    void move_d(int) {
+        vec3f cam_dir = normalize(cam_pos - cam_tar);
+        vec3f right = normalize(cross(cam_dir, vec3f(0,1,0)));
+        vec3f cam_up = normalize(cross(right, cam_dir));
+
+        vec3f new_pos = cam_pos - cam_up;
+        vec3f new_dir = normalize(new_pos - cam_tar);
+        float new_cos = dot(new_dir, vec3f(0,1,0));
+        if (std::fabs(new_cos) < 0.9f) {
+            cam_pos = new_pos;
+            updateCam();
+        }
+    }
+
+    void move_f(int) {
+//        vec3f cam_dir = normalize(cam_pos - cam_tar);
+//        cam_pos += cam_dir;
+//        updateCam();
+    }
+
+    void move_b(int) {
+//        vec3f cam_dir = normalize(cam_pos - cam_tar);
+//        cam_pos -= cam_dir;
+//        updateCam();
+    }
+
+    void updateCam() {
+        cam = lookat(cam_pos, cam_tar, vec3f(0,1,0));
+        m_filter->setMat(cam);
+    }
 
     void less(int) {
         m_data = std::max(m_data - g_delta_param, g_min_param);
@@ -140,6 +213,10 @@ private:
     bacchus::FilterModel3d* m_filter;
     bacchus::Model* m_model;
     float m_data;
+    mat4f cam;
+    vec3f cam_pos;
+    vec3f cam_tar;
+    float rts = 1.0f;
 };
 
 int main(int argc, char* argv[]) {

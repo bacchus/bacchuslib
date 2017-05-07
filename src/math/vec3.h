@@ -305,9 +305,9 @@ inline T min(const vec3<T>& v) {
 //TODO: add to other vecs
 template <typename T>
 inline vec3<T> abs(const vec3<T>& v1) {
-    return vec3<T>(std::abs(v1.x),
-                   std::abs(v1.y),
-                   std::abs(v1.z));
+    return vec3<T>(std::fabs(v1.x),
+                   std::fabs(v1.y),
+                   std::fabs(v1.z));
 }
 
 template <typename T>
