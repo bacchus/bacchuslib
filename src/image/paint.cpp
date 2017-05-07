@@ -294,19 +294,19 @@ void Paint::draw_bezier_curve(vec2i t1, vec2i t2, vec2i t3, vec2i t4, uint color
     }
 }
 
-void Paint::draw_perlin_noise(double z) {
+void Paint::draw_perlin_noise(float scale, float z) {
     uint width = m_img.width;
     uint height = m_img.height;
     uint seed = 237;
     PerlinNoise pn(seed);
     for (uint y = 0; y < height; ++y) {
         for (uint x = 0; x < width; ++x) {
-            double dx = (double)x/(double)width;
-            double dy = (double)y/(double)height;
-            double n = pn.noise(10*dx, 10*dy, z);
+            float dx = (float)x/(float)width;
+            float dy = (float)y/(float)height;
+            float n = pn.noise(scale*dx, scale*dy, z);
             //wood
-            n = 20*pn.noise(10*dx, 10*dy, z);
-            n = n - std::floor(n);
+            //float n = 20*pn.noise(10*dx, 10*dy, z);
+            //n = n - std::floor(n);
 
             m_img.pix(x,y) = lum2i(std::floor(255*n));
         }

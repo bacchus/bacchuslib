@@ -36,16 +36,13 @@ inline mat4f lookat(const vec3f& eye, const vec3f& center, const vec3f& up) {
     vec3f x = normalize(cross(up, z));
     vec3f y = normalize(cross(z, x));
     mat4f res; res.one();
-    //mat4f tr; tr.one();
     for (int i = 0; i < 3; ++i) {
         res[0][i] = x[i];
         res[1][i] = y[i];
         res[2][i] = z[i];
         res[i][3] = -center[i];
-        //tr[i][3] = -center[i];
     }
     return res;
-    //return res*tr;
 }
 
 inline mat4f projection(float coef) {

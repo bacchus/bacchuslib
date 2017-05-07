@@ -30,7 +30,7 @@ public:
     void draw_curve(const std::vector<vec2i> &line, uint color);
     void draw_bezier_curve(vec2i t1, vec2i t2, vec2i t3, vec2i t4, uint color);
 
-    void draw_perlin_noise(double z = 0.8);
+    void draw_perlin_noise(float scale = 10, float z = 0.8);
 
 public:
     // colors

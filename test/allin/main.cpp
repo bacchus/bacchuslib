@@ -335,6 +335,7 @@ public:
         m_filter = new bacchus::FilterSimple();
 //        m_filter = new bacchus::FilterLighting();
         m_filter->resize(m_width, m_height);
+        m_filter->setRatio(m_width/(float)m_height);
         m_filter->setInput(m_tex);
         m_filter->setOutput(NULL);
 //        m_filter->addTexture("img_norm", m_tex1);
