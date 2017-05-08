@@ -13,7 +13,7 @@ CCFLAG +=  -Wno-pointer-to-int-cast
 #-std=c++0x -fpermissive -Wno-permissive
 
 SOURCES += \
-    main.cpp \
+    src/main.cpp \
     ../../src/audio/*.cpp \
     ../../src/cvml/*.cpp \
     ../../src/filters/*.cpp \
