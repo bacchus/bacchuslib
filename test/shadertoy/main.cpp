@@ -74,7 +74,7 @@ public:
         /// setup qt window
         setWindowTitle("Hello kittie");
         setAttribute(Qt::WA_QuitOnClose);
-        startTimer(10);
+        startTimer(1);
         setMouseTracking(false);
         m_timer.start();
         m_width = 640; m_height = 480;
@@ -165,9 +165,9 @@ protected:
     }
 
     virtual void paintGL() {
-        m_fps.begin();
+        //m_fps.begin();
         m_filter->render();
-        m_fps.end();
+        //m_fps.end();
     }
 
 private:

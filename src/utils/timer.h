@@ -12,7 +12,7 @@ public:
     Timer() {}
     void start() { start_ms = now_ms(); }
     double ms() { return now_ms() - start_ms; }
-    double sec() { return ms()/1000.f; }
+    double sec() { return ms()/1000.0; }
 
 private:
     double now_ms() {
@@ -86,17 +86,15 @@ public:
     FpsTimer() {}
 
     void begin() {
-        t1 = m_timer.ms();
+        m_timer.start();
     }
 
     void end() {
-        float t2 = m_timer.ms();
-        fps_dt += t2 - t1;
         ++fps_dn;
         if (fps_dn >= fps_maxn) {
-            cur_fps = 1000.f*fps_dn/fps_dt;
-            std::cout << fps_dt/fps_dn << " ms, fps: " << cur_fps << std::endl;
-            fps_dt = 0;
+            double t2 = m_timer.sec();
+            cur_fps = fps_dn/t2;
+            std::cout << (t2/fps_dn) << " sec, fps: " << cur_fps << std::endl;
             fps_dn = 0;
         }
     }
@@ -109,8 +107,7 @@ private:
     Timer m_timer;
     int fps_maxn = 30;
     int fps_dn = 0;
-    float fps_dt = 0;
-    float t1 = 0;
+    double t1 = 0;
     float cur_fps = 0;
 };
 
