@@ -1,16 +1,19 @@
-#include <vector>
-#include <limits>
-#include <map>
+#include "image/png_rw.h"
+#include "filters/filter_simple.h"
+#include "glwrap/program.h"
+#include "glwrap/utilsgl.h"
+#include "utils/fileio.h"
+#include "utils/timer.h"
 
 #include <QApplication>
 #include <QGLWidget>
 #include <QKeyEvent>
 
-#include "image/png_rw.h"
-#include "filters/filter_simple.h"
-#include "glwrap/program.h"
-#include "utils/fileio.h"
-#include "utils/timer.h"
+#include <vector>
+#include <limits>
+#include <map>
+#include <string>
+#include <sstream>
 
 using namespace bacchus;
 
@@ -82,6 +85,7 @@ public:
         std::string fstr = file_readbuff("../shaders/raymarching-primitives.frag");
         m_filter = new FilterRay(vstr, fstr);
         m_filter->resize(m_width, m_height);
+        m_filter->setRatio(m_width/(float)m_height);
         m_filter->setOutput(NULL);
     }
 
@@ -100,9 +104,25 @@ public:
     typedef void (GLTest::*on_key)(int);
     std::map<int, on_key> key_press = {
         {Qt::Key_Escape, &GLTest::exit_program},
+        {Qt::Key_O, &GLTest::save_gl},
     };
 
     void exit_program(int) { close(); }
+
+    void save_gl(int) {
+        Image m_save(m_width, m_height);
+        m_save.bytespp = Image::FMT_RGBA;
+        savegl(m_save.dat8, m_save.width, m_save.height);
+        std::string fpref = "glsave_";
+        std::string fext = ".png";
+        std::string fname = "glsave_0.png";
+        for (int i = 0; file_exist(fname); ++i) {
+            std::ostringstream oss;
+            oss << fpref << i << fext;
+            fname = oss.str();
+        }
+        write_png_mirrored(fname.c_str(), m_save);
+    }
 
 protected:
     virtual void keyPressEvent(QKeyEvent* event) {

@@ -106,6 +106,11 @@ inline std::string file_readbuff(const std::string& fname) {
     return "";
 }
 
+inline bool file_exist(const std::string& fname) {
+    std::ifstream f(fname);
+    return !f.fail();
+}
+
 //TODO: c, not tested
 //inline long getFileSize(FILE* inFile) {
 //    long curPos = ftell(inFile);
