@@ -29,9 +29,9 @@ using namespace bacchus;
 //uniform vec4      iDate;                 // (year, month, day, time in seconds)
 //uniform float     iSampleRate;           // sound sample rate (i.e., 44100)
 
-class FilterRay: public Filter {
+class ShaderToy: public Filter {
 public:
-    FilterRay(const std::string& vs, const std::string& fs)
+    ShaderToy(const std::string& vs, const std::string& fs)
         : Filter(vs,fs)
     {
         m_time.x = 0.f;
@@ -83,7 +83,7 @@ public:
         /// opengl specific
         std::string vstr = file_readbuff("../shaders/shadertoy.vert");
         std::string fstr = file_readbuff("../shaders/raymarching-primitives.frag");
-        m_filter = new FilterRay(vstr, fstr);
+        m_filter = new ShaderToy(vstr, fstr);
         m_filter->resize(m_width, m_height);
         m_filter->setRatio(m_width/(float)m_height);
         m_filter->setOutput(NULL);
@@ -172,7 +172,7 @@ protected:
 
 private:
     int m_width, m_height;
-    FilterRay* m_filter;
+    ShaderToy* m_filter;
     vec2f m_mousepos;
     Timer m_timer;
     FpsTimer m_fps;
