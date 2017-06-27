@@ -122,6 +122,32 @@ inline void build_max_heap(std::vector<T>& a) {
         max_heapify(a, a.size(), i);
 }
 
+template<typename T>
+inline T pop_max(std::vector<T>& a) {
+    assert(a.size());
+    const T max = a[0];
+    a[0] = a[a.size()-1];
+    a.resize(a.size()-1);
+    max_heapify(a, a.size(), 0);
+    return max;
+}
+
+template<typename T>
+inline void inc_key(std::vector<T>& a, int i, T key) {
+    assert(key > a[i]);
+    a[i] = key;
+    while (i > 0 && a[parent(i)] < a[i]) {
+        std::swap(a[i], a[parent(i)]);
+        i = parent(i);
+    }
+}
+
+template<typename T>
+inline void insert_key(std::vector<T>& a, T key) {
+    a.push_back(key-1);
+    inc_key(a, a.size(), key);
+}
+
 } // namespace heap
 
 template<typename T>
