@@ -9,8 +9,92 @@
 
 namespace bacchus {
 
+//====================================================================
 template<typename T>
-void combsort(std::vector<T>& a) {
+inline bool test_sort(std::vector<T>& a) {
+    for (int i = 1; i < (int)a.size(); ++i) {
+        if (a[i] < a[i-1])
+            return false;
+    }
+    return true;
+}
+
+//====================================================================
+template<typename T>
+inline void insert_sort(std::vector<T>& a) {
+    for (int j = 1; j < (int)a.size(); ++j) {
+        const T key = a[j];
+        int i = j - 1;
+        while (i >= 0 && a[i] > key) {
+            a[i+1] = a[i];
+            --i;
+        }
+        a[i+1] = key;
+    }
+}
+
+//====================================================================
+template<typename T>
+inline void bubble_sort(std::vector<T>& a) {
+    for (int i = 0; i < (int)a.size(); ++i) {
+        for (int j = (int)a.size()-1; j > i; --j) {
+            if (a[j] < a[j-1])
+                std::swap(a[j], a[j-1]);
+        }
+    }
+}
+
+//====================================================================
+/// inplace realisation
+/// |p| | |q| | |r|
+/// |0|1|2|3|4|5| |
+template<typename T>
+inline void merge_sort(std::vector<T>& a, int l, int r) {
+
+    // condition
+    if (l + 1 < r) {
+
+        // pivot
+        int q = (l+r)/2;
+
+        // divide
+        merge_sort(a, l, q);
+        merge_sort(a, q, r);
+
+        // merge
+        std::vector<T> res(r-l);
+        int i = l; int j = q;
+        T ai = a[i];
+        T aj = a[j];
+        for (int k = 0; k < r-l; ++k) {
+            if (ai < aj) {
+                res[k] = ai;
+                ++i;
+                ai = (i<q ? a[i] : a[r-1]);
+            } else {
+                res[k] = aj;
+                ++j;
+                aj = (j<r ? a[j] : a[q-1]);
+            }
+        }
+
+        // inplace
+        for (int k = 0; k < r-l; ++k) {
+            a[l+k] = res[k];
+        }
+
+    }
+}
+
+//====================================================================
+template<typename T>
+inline void merge_sort(std::vector<T>& a) {
+    merge_sort(a, 0, a.size());
+}
+
+//====================================================================
+template<typename T>
+inline void combsort(std::vector<T>& a) {
     int n = 0;
     float gap = a.size();
     bool ok = true;
@@ -61,35 +145,12 @@ inline void quick_sort(std::vector<T>& a, int l, int r) {
 }
 
 template<typename T>
-inline void quick_sort(T* a, int n) {
-    if (n<=1)
+inline void quick_sort(std::vector<T>& a) {
+    if (a.size()<=1)
         return;
-    quick_sort(a,0,n);
+    quick_sort(a,0,a.size());
 }
 
-template<typename T>
-inline T* merge_sort(const T* a, int l, int r) {
-    T* res = new T[r-l];
-    if ((r-l)==1) {
-        res[0] = a;
-        return res;
-    }
-    T* left = merge_sort(a, l, (l+r)/2);
-    T* right = merge_sort(a, 1+(l+r)/2, r);
-    int i = 0; int j = 0;
-    for (int k = 0; k < r-l; ++k) {
-        if (left[i] < right[j]) {
-            res[k] = left[i];
-            ++i;
-        } else {
-            res[k] = right[j];
-            ++j;
-        }
-    }
-    delete[] left;
-    delete[] right;
-    return res;
-}
 
 template<typename T>
 inline T find_median(T* a, int n) {

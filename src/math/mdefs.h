@@ -56,6 +56,7 @@ inline void rndmz() {
 template<typename T>
 inline bool eq(const T&, const T&) {
     assert(false);
+    return false;
 }
 
 template<>
