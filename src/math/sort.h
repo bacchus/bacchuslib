@@ -93,6 +93,48 @@ inline void merge_sort(std::vector<T>& a) {
 }
 
 //====================================================================
+namespace heap {
+
+inline int parent(int i) { return (i-1)/2; }
+inline int letf(int i) { return 2*i+1; }
+inline int right(int i) { return 2*i+2; }
+
+template<typename T>
+inline void max_heapify(std::vector<T>& a, int heap_size, int i) {
+    const int l = letf(i);
+    const int r = right(i);
+    int largest = i;
+
+    if (l<heap_size && a[l]>a[i])
+        largest = l;
+    if (r<heap_size && a[r]>a[largest])
+        largest = r;
+
+    if (largest != i) {
+        std::swap(a[i], a[largest]);
+        max_heapify(a, heap_size, largest);
+    }
+}
+
+template<typename T>
+inline void build_max_heap(std::vector<T>& a) {
+    for (int i = a.size()/2 - 1; i >= 0; --i)
+        max_heapify(a, a.size(), i);
+}
+
+} // namespace heap
+
+template<typename T>
+void heap_sort(std::vector<T>& a) {
+    heap::build_max_heap(a);
+    int heap_size = a.size();
+    for (int i = a.size()-1; i >= 1; --i) {
+        std::swap(a[0], a[i]);
+        heap::max_heapify(a, --heap_size, 0);
+    }
+}
+
+//====================================================================
 template<typename T>
 inline void combsort(std::vector<T>& a) {
     int n = 0;

@@ -103,6 +103,38 @@ TEST(BubbleSort, Empty) {
 }
 
 //====================================================================
+TEST(HeapSort, General) {
+    std::vector<int> a = {4,1,3,2,16,9,10,14,8,7};
+    std::cout << "a: " << a << std::endl;
+    heap_sort(a);
+    std::cout << "b: " << a << std::endl;
+    ASSERT_TRUE(test_sort(a));
+}
+
+TEST(HeapSort, TwoElem) {
+    std::vector<int> a = {7,4};
+    std::cout << "a: " << a << std::endl;
+    heap_sort(a);
+    std::cout << "b: " << a << std::endl;
+    ASSERT_TRUE(test_sort(a));
+}
+
+TEST(HeapSort, OneElem) {
+    std::vector<int> a = {5};
+    std::cout << "a: " << a << std::endl;
+    heap_sort(a);
+    std::cout << "b: " << a << std::endl;
+    ASSERT_TRUE(test_sort(a));
+}
+
+TEST(HeapSort, Empty) {
+    std::vector<int> a;
+    std::cout << "a: " << a << std::endl;
+    heap_sort(a);
+    std::cout << "b: " << a << std::endl;
+    ASSERT_TRUE(test_sort(a));
+}
+//====================================================================
 //TEST(SortAlgs, QuickSort) {
 //    std::vector<float> a = {3,8,5,7,1,6,2,9,4};
 //    std::cout << "a: " << a << std::endl;
