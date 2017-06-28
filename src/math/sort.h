@@ -202,6 +202,20 @@ inline void quick_sort(std::vector<T>& a) {
 }
 
 //====================================================================
+inline void count_sort(std::vector<int>& b, const std::vector<int>& a, int k) {
+    std::vector<int> c(k,0);
+    b.resize(a.size());
+    for (int i = 0; i < (int)a.size(); ++i)
+        ++c[a[i]];
+    for (int i = 1; i < (int)c.size(); ++i)
+        c[i] += c[i-1];
+    for (int i = a.size()-1; i >= 0; --i) {
+        b[c[a[i]]-1] = a[i];
+        --c[a[i]];
+    }
+}
+
+//====================================================================
 template<typename T>
 inline void combsort(std::vector<T>& a) {
     int n = 0;
@@ -223,6 +237,7 @@ inline void combsort(std::vector<T>& a) {
     std::cout<<"combsort complexity: "<<n<<" ("<<a.size()<<")"<<std::endl;
 }
 
+//====================================================================
 template<typename T>
 inline T find_median(T* a, int n) {
     int k = n/2;

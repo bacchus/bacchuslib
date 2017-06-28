@@ -141,6 +141,17 @@ TEST(QuickSort, General) {
     std::cout << "a: " << a << std::endl;
     quick_sort(a);
     std::cout << "b: " << a << std::endl;
+    ASSERT_TRUE(test_sort(a));
+}
+
+//====================================================================
+TEST(CountSort, General) {
+    std::vector<int> a = {3,8,5,7,1,6,2,9,4};
+    std::cout << "a: " << a << std::endl;
+    std::vector<int> b;
+    count_sort(b,a,10);
+    std::cout << "b: " << b << std::endl;
+    ASSERT_TRUE(test_sort(b));
 }
 
 //====================================================================
