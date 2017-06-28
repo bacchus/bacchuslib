@@ -134,14 +134,16 @@ TEST(HeapSort, Empty) {
     std::cout << "b: " << a << std::endl;
     ASSERT_TRUE(test_sort(a));
 }
-//====================================================================
-//TEST(SortAlgs, QuickSort) {
-//    std::vector<float> a = {3,8,5,7,1,6,2,9,4};
-//    std::cout << "a: " << a << std::endl;
-//    quick_sort(a,0,9);
-//    std::cout << "b: " << a << std::endl;
-//}
 
+//====================================================================
+TEST(QuickSort, General) {
+    std::vector<int> a = {3,8,5,7,1,6,2,9,4};
+    std::cout << "a: " << a << std::endl;
+    quick_sort(a);
+    std::cout << "b: " << a << std::endl;
+}
+
+//====================================================================
 //TEST(SortAlgs, CombSort) {
 //    std::vector<float> a = {-45,86,-75,-20,44,-14,-12,0};
 //    std::cout << "a: " << a << std::endl;

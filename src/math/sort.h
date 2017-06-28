@@ -162,6 +162,47 @@ void heap_sort(std::vector<T>& a) {
 
 //====================================================================
 template<typename T>
+inline int choose_pivot(std::vector<T>&, int l, int r) {
+    return l + rnd(r-l);
+}
+
+template<typename T>
+inline int partition(std::vector<T>& a, int l, int r) {
+    int pi = choose_pivot(a,l,r);
+    std::swap(a[l], a[pi]);
+
+    T p = a[l];
+    int i = l+1;
+    for (int j = l+1; j < r; ++j) {
+        if (a[j] < p) {
+            std::swap(a[j], a[i]);
+            ++i;
+        }
+    }
+
+    std::swap(a[l], a[i-1]);
+    return i-1;
+}
+
+template<typename T>
+inline void quick_sort(std::vector<T>& a, int l, int r) {
+    rndmz();
+    if ((r-l)<=1)
+        return;
+    int i = partition(a,l,r);
+    quick_sort(a,l,i);
+    quick_sort(a,i+1,r);
+}
+
+template<typename T>
+inline void quick_sort(std::vector<T>& a) {
+    if (a.size()<=1)
+        return;
+    quick_sort(a,0,a.size());
+}
+
+//====================================================================
+template<typename T>
 inline void combsort(std::vector<T>& a) {
     int n = 0;
     float gap = a.size();
@@ -181,44 +222,6 @@ inline void combsort(std::vector<T>& a) {
     }
     std::cout<<"combsort complexity: "<<n<<" ("<<a.size()<<")"<<std::endl;
 }
-
-//template<typename T>
-//inline int choose_pivot(T*, int l, int) {
-//    return l;
-//}
-
-template<typename T>
-inline int partition(std::vector<T>& a, int l, int r) {
-//    int pi = choose_pivot(a,l,r);
-//    std::swap(a[pi], a[l]);
-    T p = a[l];
-    int i = l+1;
-    for (int j = l+1; j < r; ++j) {
-        if (a[j] < p) {
-            std::swap(a[j], a[i]);
-            ++i;
-        }
-    }
-    std::swap(a[l], a[i-1]);
-    return i-1;
-}
-
-template<typename T>
-inline void quick_sort(std::vector<T>& a, int l, int r) {
-    if ((r-l)<=1)
-        return;
-    int i = partition(a,l,r);
-    quick_sort(a,l,i);
-    quick_sort(a,i+1,r);
-}
-
-template<typename T>
-inline void quick_sort(std::vector<T>& a) {
-    if (a.size()<=1)
-        return;
-    quick_sort(a,0,a.size());
-}
-
 
 template<typename T>
 inline T find_median(T* a, int n) {
