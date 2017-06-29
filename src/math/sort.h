@@ -11,7 +11,7 @@ namespace bacchus {
 
 //====================================================================
 template<typename T>
-inline bool test_sort(std::vector<T>& a) {
+inline bool test_sort(const std::vector<T>& a) {
     for (int i = 1; i < (int)a.size(); ++i) {
         if (a[i] < a[i-1])
             return false;
@@ -25,6 +25,7 @@ inline void insert_sort(std::vector<T>& a) {
     for (int j = 1; j < (int)a.size(); ++j) {
         const T key = a[j];
         int i = j - 1;
+        // can use here bin-search
         while (i >= 0 && a[i] > key) {
             a[i+1] = a[i];
             --i;
@@ -212,6 +213,32 @@ inline void count_sort(std::vector<int>& b, const std::vector<int>& a, int k) {
     for (int i = a.size()-1; i >= 0; --i) {
         b[c[a[i]]-1] = a[i];
         --c[a[i]];
+    }
+}
+
+//inline void radix_sort(std::vector<int>& a, int d) {
+//    for (int i = 0; i < d; ++i) {
+//        count_sort(b,a by i bit,k);
+//    }
+//}
+
+//====================================================================
+/// 0.0<=a[i]<=1.0; equaly distributed
+inline void bucket_sort(std::vector<float>& b, const std::vector<float>& a) {
+    const int n = (int)a.size();
+    std::vector< std::vector<float> > buk(n);
+    b.reserve(n);
+
+    for (int i = 0; i < n; ++i)
+        buk[(int)(n*a[i])].push_back(a[i]);
+
+    for (int i = n-1; i >= 0; --i)
+        insert_sort(buk[i]);
+
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < (int)buk[i].size(); ++j) {
+            b.push_back(buk[i][j]);
+        }
     }
 }
 

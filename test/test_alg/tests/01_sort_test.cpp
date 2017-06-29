@@ -155,6 +155,16 @@ TEST(CountSort, General) {
 }
 
 //====================================================================
+TEST(BucketSort, General) {
+    std::vector<float> a = {0.78, 0.17, 0.39, 0.26, 0.72, 0.94, 0.21, 0.12, 0.23, 0.68};
+    std::cout << "a: " << a << std::endl;
+    std::vector<float> b;
+    bucket_sort(b,a);
+    std::cout << "b: " << b << std::endl;
+    ASSERT_TRUE(test_sort(b));
+}
+
+//====================================================================
 //TEST(SortAlgs, CombSort) {
 //    std::vector<float> a = {-45,86,-75,-20,44,-14,-12,0};
 //    std::cout << "a: " << a << std::endl;
