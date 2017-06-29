@@ -25,7 +25,7 @@ inline void insert_sort(std::vector<T>& a) {
     for (int j = 1; j < (int)a.size(); ++j) {
         const T key = a[j];
         int i = j - 1;
-        // can use here bin-search
+        // bin-search-insert can be used here
         while (i >= 0 && a[i] > key) {
             a[i+1] = a[i];
             --i;
@@ -187,21 +187,35 @@ inline int partition(std::vector<T>& a, int l, int r) {
 
 template<typename T>
 inline void quick_sort(std::vector<T>& a, int l, int r) {
-    rndmz();
     if ((r-l)<=1)
         return;
-    int i = partition(a,l,r);
-    quick_sort(a,l,i);
-    quick_sort(a,i+1,r);
+    int p = partition(a,l,r);
+    quick_sort(a,l,p);
+    quick_sort(a,p+1,r);
 }
 
 template<typename T>
 inline void quick_sort(std::vector<T>& a) {
-    if (a.size()<=1)
-        return;
-    quick_sort(a,0,a.size());
+    if (a.size() > 1) {
+        rndmz();
+        quick_sort(a,0,a.size());
+    }
 }
 
+template<typename T>
+inline T quick_select(std::vector<T> a, int l, int r, int i) {
+    if ((r-l)<=1)
+        return a[l];
+
+    const int p = partition(a,l,r);
+    const int k = p - l;
+    if (i == k)
+        return a[p];
+    else if (i < k)
+        return quick_select(a,l,p-1,i);
+    else
+        return quick_select(a,p+1,r,i-k);
+}
 //====================================================================
 inline void count_sort(std::vector<int>& b, const std::vector<int>& a, int k) {
     std::vector<int> c(k,0);
@@ -283,6 +297,82 @@ inline void find_minmax(T& min_val, T& max_val, const std::vector<T>& a) {
         min_val = min_ai < min_val ? min_ai : min_val;
     }
 }
+
+//====================================================================
+/// BCC: not tested
+namespace qs { // deterministic quick select
+
+template<typename T>
+inline void qs_insert_sort(std::vector<T>& a, int l, int r) {
+    for (int j = l+1; j < r; ++j) {
+        const T key = a[j];
+        int i = j - 1;
+        while (i >= l && a[i] > key) {
+            a[i+1] = a[i];
+            --i;
+        }
+        a[i+1] = key;
+    }
+}
+
+template<typename T>
+inline T qs_median_of_median(std::vector<T>& a) {
+    const int n = (int)a.size();
+
+    // if 1 element return it
+    if (n==1)
+        return a[0];
+
+    std::vector<T> medians;
+    medians.reserve(n/5+1);
+
+    // divide for 5 elements in group
+    for (int i = 0; i < n/5; ++i) {
+        qs_insert_sort(a, 5*i, 5*i+5);
+        medians.push_back(a[5*i+2]);
+    }
+
+    // last n mod 5 elements
+    const int ln = n%5;
+    if (ln) {
+        qs_insert_sort(a, n - ln, n);
+        medians.push_back(a[n - ln/2 - 1]);// lower median
+    }
+
+    return qs_median_of_median(medians);
+}
+
+template<typename T>
+inline int qs_partition(std::vector<T>& a, int l, int r, const T& p) {
+    int i = l;
+    for (int j = l; j < r; ++j) {
+        if (a[j] < p) {
+            std::swap(a[j], a[i]);
+            ++i;
+        }
+    }
+
+    return i-1;
+}
+
+template<typename T>
+inline T qs_quick_select(std::vector<T>& a, int l, int r, int i) {
+    if ((r-l)<=1)
+        return a[l];
+
+    T m = qs_median_of_median(a);
+    const int p = qs_partition(a,l,r,m);
+    const int k = p - l;
+    if (i == k)
+        return a[p];
+    else if (i < k)
+        return qs_quick_select(a,l,p-1,i);
+    else
+        return qs_quick_select(a,p+1,r,i-k);
+}
+
+}
+
 
 //====================================================================
 template<typename T>
