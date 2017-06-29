@@ -37,10 +37,10 @@ inline void insert_sort(std::vector<T>& a) {
 //====================================================================
 template<typename T>
 inline void bubble_sort(std::vector<T>& a) {
-    for (int i = 0; i < (int)a.size(); ++i) {
-        for (int j = (int)a.size()-1; j > i; --j) {
-            if (a[j] < a[j-1])
-                std::swap(a[j], a[j-1]);
+    for (int j = 1; j < (int)a.size(); ++j) {
+        for (int i = j-1; i >=0; --i) {
+            if (a[i] > a[i+1])
+                std::swap(a[i], a[i+1]);
         }
     }
 }
