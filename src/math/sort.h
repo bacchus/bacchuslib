@@ -266,6 +266,26 @@ inline void combsort(std::vector<T>& a) {
 
 //====================================================================
 template<typename T>
+inline void find_minmax(T& min_val, T& max_val, const std::vector<T>& a) {
+    const int n = a.size();
+    const int ev = 1 - n%2;
+
+    min_val = std::min(a[n-1], a[n-1-ev]);
+    max_val = std::max(a[n-1], a[n-1-ev]);
+
+    for (int i = 0; i < (n-1)/2; ++i) {
+        const int j = a[2*i] < a[2*i+1] ? 0 : 1;
+
+        const T& min_ai = a[2*i+j];
+        const T& max_ai = a[2*i+1-j];
+
+        max_val = max_ai > max_val ? max_ai : max_val;
+        min_val = min_ai < min_val ? min_ai : min_val;
+    }
+}
+
+//====================================================================
+template<typename T>
 inline T find_median(T* a, int n) {
     int k = n/2;
     for (int i = 0; i < k+1; ++i) {
