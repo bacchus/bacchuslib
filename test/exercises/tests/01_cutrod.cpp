@@ -86,7 +86,7 @@ TEST(CutRod, Up) {
 //====================================================================
 //====================================================================
 std::vector<int> time_prices(51,2);
-int time_n = 30;
+int time_n = 25; //30 - slow: 13s
 int time_res = 2*time_n;
 
 TEST(CutRod, SlowTime) {
@@ -96,12 +96,22 @@ TEST(CutRod, SlowTime) {
 }
 
 TEST(CutRod, MemTime) {
+    std::vector<int> time_prices(50001,2);
+    //int time_n = 50000; //craches on rod_length = 6584
+    int time_n = 43415; // 20s ;craches on 43416
+    int time_res = 2*time_n;
+
     int max_price = cut_rod_mem(time_prices, time_n);
     std::cout << "max_price: " << max_price << std::endl;
     EXPECT_EQ(time_res, max_price);
 }
 
 TEST(CutRod, UpTime) {
+    std::vector<int> time_prices(50001,2);
+    int time_n = 43415; //50000 - up: 13.5s
+                        // 12s vs 20s - mem max noncrash
+    int time_res = 2*time_n;
+
     int max_price = cut_rod_up(time_prices, time_n);
     std::cout << "max_price: " << max_price << std::endl;
     EXPECT_EQ(time_res, max_price);
