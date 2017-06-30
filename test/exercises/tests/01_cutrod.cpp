@@ -51,6 +51,35 @@ int cut_rod_up(const std::vector<int>& prices, int rod_length) {
 }
 
 //====================================================================
+int cut_rod_up_solution(const std::vector<int>& prices, int rod_length) {
+    std::vector<int> cache(rod_length+1, 0);
+    std::vector<int> solution(rod_length+1, 0);
+
+    for (int j = 1; j <= rod_length; ++j) {
+        int max_price = -1;
+        for (int i = 1; i <= j; ++i) {
+            int cur_price = prices[i] + cache[j-i];
+            if (cur_price > max_price) {
+                max_price = cur_price;
+                solution[j] = i;
+            }
+        }
+        cache[j] = max_price;
+    }
+
+    std::cout << "max_price: " << cache[rod_length] << std::endl;
+    std::cout << "cache: " << cache << std::endl;
+
+    while (rod_length > 0) {
+        std::cout << solution[rod_length] << " ";
+        rod_length -= solution[rod_length];
+    }
+    std::cout << std::endl;
+
+    return cache[rod_length];
+}
+
+//====================================================================
 std::vector<int> length = {0,1,2,3, 4, 5, 6, 7, 8, 9,10};
 std::vector<int> prices = {0,1,5,8, 9,10,17,17,20,24,30};
 std::vector<int> maxces = {0,1,5,8,10,13,17,18,22,25,30};
@@ -96,10 +125,10 @@ TEST(CutRod, SlowTime) {
 }
 
 TEST(CutRod, MemTime) {
-    std::vector<int> time_prices(50001,2);
-    //int time_n = 50000; //craches on rod_length = 6584
-    int time_n = 43415; // 20s ;craches on 43416
-    int time_res = 2*time_n;
+//    std::vector<int> time_prices(50001,2);
+//    //int time_n = 50000; //craches on rod_length = 6584
+//    int time_n = 43415; // 20s ;craches on 43416
+//    int time_res = 2*time_n;
 
     int max_price = cut_rod_mem(time_prices, time_n);
     std::cout << "max_price: " << max_price << std::endl;
@@ -107,12 +136,17 @@ TEST(CutRod, MemTime) {
 }
 
 TEST(CutRod, UpTime) {
-    std::vector<int> time_prices(50001,2);
-    int time_n = 43415; //50000 - up: 13.5s
-                        // 12s vs 20s - mem max noncrash
-    int time_res = 2*time_n;
+//    std::vector<int> time_prices(50001,2);
+//    int time_n = 43415; //50000 - up: 13.5s
+//                        // 12s vs 20s - mem max noncrash
+//    int time_res = 2*time_n;
 
     int max_price = cut_rod_up(time_prices, time_n);
     std::cout << "max_price: " << max_price << std::endl;
     EXPECT_EQ(time_res, max_price);
+}
+
+//====================================================================
+TEST(CutRod, UpSolution) {
+    cut_rod_up_solution(prices, 7);
 }
