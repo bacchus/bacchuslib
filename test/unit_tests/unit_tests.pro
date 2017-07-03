@@ -1,5 +1,7 @@
 CONFIG -= qt
 CONFIG += c++11
+CONFIG -= debug_and_release
+
 TARGET = unit_tests
 
 DESTDIR = bin

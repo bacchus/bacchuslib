@@ -16,6 +16,7 @@ SOURCES += \
     ../../3rdparty/gtest/gtest-all.cpp \
     tests/sample_test.cpp \
     tests/01_cutrod.cpp \
+    tests/02_fibonachi.cpp
 
 
 HEADERS += \

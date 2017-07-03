@@ -1,5 +1,6 @@
 #include "setting.h"
 
+#if TEST_01_CUTROD
 //====================================================================
 int cut_rod(const std::vector<int>& prices, int rod_length) {
     if (rod_length==0)
@@ -150,3 +151,5 @@ TEST(CutRod, UpTime) {
 TEST(CutRod, UpSolution) {
     cut_rod_up_solution(prices, 7);
 }
+
+#endif
