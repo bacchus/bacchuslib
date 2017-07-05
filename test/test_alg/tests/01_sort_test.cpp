@@ -1,6 +1,8 @@
 #include "setting.h"
 #include "math/sort.h"
 
+#if TEST_01_SORTST
+
 using namespace bacchus;
 
 //====================================================================
@@ -177,3 +179,5 @@ TEST(BucketSort, General) {
 //    int a[] = {3, 13, 7, 5, 21, 23, 39, 23, 40, 23, 14, 12, 56, 23, 29};
 //    EXPECT_EQ(23, (int)find_median(a,sizeof(a)/sizeof(int)));
 //}
+
+#endif

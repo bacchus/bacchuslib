@@ -1,5 +1,6 @@
 CONFIG -= qt
 CONFIG += c++11
+CONFIG -= debug_and_release
 
 TARGET = test_alg
 
@@ -15,6 +16,7 @@ SOURCES += \
     ../../3rdparty/gtest/gtest-all.cpp \
     tests/sample_test.cpp \
     tests/01_sort_test.cpp \
+    tests/02_rbtree_test.cpp
 
 
 HEADERS += \
