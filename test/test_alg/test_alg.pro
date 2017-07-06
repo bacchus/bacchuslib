@@ -16,7 +16,8 @@ SOURCES += \
     ../../3rdparty/gtest/gtest-all.cpp \
     tests/sample_test.cpp \
     tests/01_sort_test.cpp \
-    tests/02_rbtree_test.cpp
+    tests/02_rbtree_test.cpp \
+    tests/03_merge_heap.cpp
 
 
 HEADERS += \
