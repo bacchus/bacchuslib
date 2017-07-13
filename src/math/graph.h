@@ -88,6 +88,7 @@ void print_path(const std::vector<int>& parnt, int s, int v);
 void bfs(const Graph& g, int s, std::vector<int>& dist, std::vector<int>& prnt, std::vector<int>& colr);// O(V + E)
 void dfs(const Graph& g);// O(V + E)
 
+std::deque<int> topological_sort(const Graph& g);
 void find_undirected_connected_components(const Graph& g);
 
 // oriented graph

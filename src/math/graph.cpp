@@ -12,11 +12,15 @@ namespace bacchus {
 
 //const std::vector<int> Graph::m_empty_list;
 
-const int white = 0;// novisited
-const int gray = 1;// discovered
-const int black = 2;// processed
+enum VisitColor {
+    WHIT = 0,// novisited
+    GRAY = 1,// discovered
+    BLAC = 2// processed
+};
+
 //const int nil = -1;// points to no
 
+//====================================================================
 void print_path(const std::vector<int> &prnt, int s, int v) {
     if (s == v) {
         std::cout << s << " ";
@@ -28,6 +32,7 @@ void print_path(const std::vector<int> &prnt, int s, int v) {
     }
 }
 
+//====================================================================
 void bfs(const Graph& g, int s
          , std::vector<int>& dist
          , std::vector<int>& prnt
@@ -46,7 +51,7 @@ void bfs(const Graph& g, int s
 //    dist.resize(g.vsize(), BCC_M_INT_MAX);
 //    prnt.resize(g.vsize(), -1);
 
-    colr[s] = gray;
+    colr[s] = GRAY;
     dist[s] = 0;
     prnt[s] = nil;
 
@@ -55,25 +60,26 @@ void bfs(const Graph& g, int s
         int u = que.front();
         que.pop_front();
         for (auto v: g.adj(u)) {
-            if (colr[v.first] == white) {
-                colr[v.first] = gray;
+            if (colr[v.first] == WHIT) {
+                colr[v.first] = GRAY;
                 dist[v.first] = dist[u] + 1;
                 prnt[v.first] = u;
                 que.push_back(v.first);
             }
         }
-        colr[u] = black;
+        colr[u] = BLAC;
     }
 }
 
+//====================================================================
 void find_undirected_connected_components(const Graph& g) {
     std::vector<int> dist(g.vsize(), BCC_M_INT_MAX);
     std::vector<int> prnt(g.vsize(), nil);
-    std::vector<int> colr(g.vsize(), white);
+    std::vector<int> colr(g.vsize(), WHIT);
 
     std::cout << "cc: ";
     for (auto v: g.vlist()) {
-        if (colr[v]==white) {
+        if (colr[v]==WHIT) {
             std::cout << v << " ";
             bfs(g,v, dist,prnt,colr);
         }
@@ -81,6 +87,7 @@ void find_undirected_connected_components(const Graph& g) {
     std::cout << std::endl;
 }
 
+//====================================================================
 void dfs_visit(const Graph& g, int u, int& t
                , std::vector<int>& colr
                , std::vector<int>& prnt
@@ -90,29 +97,29 @@ void dfs_visit(const Graph& g, int u, int& t
                )
 {
     //std::cout<<"(";
-    colr[u] = gray;
+    colr[u] = GRAY;
     dist[u] = ++t;
     for (auto v: g.adj(u)) {
-        if (colr[v.first]==white) {
+        if (colr[v.first]==WHIT) {
             prnt[v.first] = u;
             dfs_visit(g,v.first,t, colr, prnt, dist, finl/*, sortd*/);
         }
     }
-    colr[u] = black;
+    colr[u] = BLAC;
     finl[u] = ++t;
     //sortd.push_front(u);
     //std::cout<<")";
 }
 
 void dfs(const Graph& g) {
-    std::vector<int> colr(g.vsize(), white);
+    std::vector<int> colr(g.vsize(), WHIT);
     std::vector<int> prnt(g.vsize(), nil);
     std::vector<int> dist(g.vsize(), 0);
     std::vector<int> finl(g.vsize(), 0);
 //    std::deque<int> sortd;
     int t = 0;
     for (auto u: g.vlist()) {
-        if (colr[u]==white) {
+        if (colr[u]==WHIT) {
             dfs_visit(g,u,t, colr, prnt, dist, finl/*, sortd*/);
         }
     }
@@ -128,6 +135,7 @@ void dfs(const Graph& g) {
     PRINT(finl);
 }
 
+//====================================================================
 void sort_dfs_visit(const Graph& g, int u, int& t
                , std::vector<int>& colr
                , std::vector<int>& prnt
@@ -136,35 +144,36 @@ void sort_dfs_visit(const Graph& g, int u, int& t
                , std::deque<int>& sortd
                )
 {
-    colr[u] = gray;
+    colr[u] = GRAY;
     ++t;
     dist[u] = t;
     for (auto v: g.adj(u)) {
-        if (colr[v.first]==white) {
+        if (colr[v.first]==WHIT) {
             prnt[v.first] = u;
             sort_dfs_visit(g,v.first,t, colr, prnt, dist, finl, sortd);
         }
     }
-    colr[u] = black;
+    colr[u] = BLAC;
     finl[u] = ++t;
     sortd.push_front(u);
 }
 
 std::deque<int> topological_sort(const Graph& g) {
-    std::vector<int> colr(g.vsize(), white);
+    std::vector<int> colr(g.vsize(), WHIT);
     std::vector<int> prnt(g.vsize(), nil);
     std::vector<int> dist(g.vsize(), 0);
     std::vector<int> finl(g.vsize(), 0);
     std::deque<int> sortd;
     int t = 0;
     for (auto u: g.vlist()) {
-        if (colr[u]==white) {
+        if (colr[u]==WHIT) {
             sort_dfs_visit(g,u,t, colr, prnt, dist, finl, sortd);
         }
     }
     return sortd;
 }
 
+//====================================================================
 Graph transpose(const Graph& g) {
     Graph tr;
     for (auto u: g.vlist()) {
@@ -182,13 +191,13 @@ void strongly_connectes_components(const Graph& g) {
     std::cout << std::endl;
     Graph tr = transpose(g);
 
-    std::vector<int> colr(g.vsize(), white);
+    std::vector<int> colr(g.vsize(), WHIT);
     std::vector<int> prnt(g.vsize(), nil);
     std::vector<int> dist(g.vsize(), 0);
     std::vector<int> finl(g.vsize(), 0);
     int t = 0;
     for (auto u: gsortd) {
-        if (colr[u]==white) {
+        if (colr[u]==WHIT) {
             std::deque<int> trsortd;
             sort_dfs_visit(tr,u,t, colr, prnt, dist, finl, trsortd);
             for (auto x: trsortd) std::cout << x << " ";
@@ -198,7 +207,9 @@ void strongly_connectes_components(const Graph& g) {
     std::cout << std::endl;
 }
 
+//====================================================================
 std::vector<vec3i> mst_kruskal(const Graph& g) {
+    // sort edges by weight
     std::vector<vec3i> edges;
     for (auto v: g.vlist()) {
         for (auto u: g.adj(v)) {
@@ -206,15 +217,23 @@ std::vector<vec3i> mst_kruskal(const Graph& g) {
         }
     }
     std::sort(edges.begin(), edges.end(), [](const vec3i&a, const vec3i&b){ return a.z<b.z; });
-    std::vector<int> sets(g.vsize());
+
+    // make sets of verts - for v in vlist: make-set(v)
     int i = 0;
+    std::vector<int> sets(g.vsize());
     std::generate(sets.begin(), sets.end(), [&i](){return i++;});
+
+    // visit edges in weight order
     std::vector<vec3i> res;
-    for (vec3i e: edges) {
+    for (const vec3i& e: edges) {
         int sx = sets[e.x];
         int sy = sets[e.y];
+        // find-set(x) != find-set(y)
         if (sx!=sy) {
+            // A U A {(x,y)}
             res.push_back(e);
+
+            // union(u,v)
             for (int& j: sets) {
                 if (j==sy)
                     j = sx;
@@ -224,6 +243,7 @@ std::vector<vec3i> mst_kruskal(const Graph& g) {
     return res;
 }
 
+//====================================================================
 std::vector<vec3i> mst_prim(const Graph& g) {
     std::set<int> que(g.vlist().begin(), g.vlist().end());
     std::vector<vec3i> res;
@@ -232,7 +252,7 @@ std::vector<vec3i> mst_prim(const Graph& g) {
         vec3i minv(BCC_M_INT_MAX);
         for (auto v: que) {
             for (auto u: g.adj(v)) {
-                if (!que.count(u.first) && u.second<minv.z) {
+                if (!que.count(u.first) && u.second < minv.z) {
                     minv.x = v;
                     minv.y = u.first;
                     minv.z = u.second;
@@ -245,6 +265,7 @@ std::vector<vec3i> mst_prim(const Graph& g) {
     return res;
 }
 
+//====================================================================
 void relax(int u, int v, int w, std::vector<int>& dist, std::vector<int>& prnt) {
     if (dist[v] > dist[u] + w) {
         dist[v] = dist[u] + w;
@@ -402,7 +423,7 @@ void ford_fulkerson(const Graph &g, int s, int t) {
     int n = 0;
     while (found) {
         found = false;
-        std::vector<int> colr(g.vsize(), white); colr[s] = gray;
+        std::vector<int> colr(g.vsize(), WHIT); colr[s] = GRAY;
         std::vector<int> prnt(g.vsize(), nil); prnt[s] = nil;
         std::deque<int> que{s};
         while (!que.empty() && !found) {
@@ -411,18 +432,18 @@ void ford_fulkerson(const Graph &g, int s, int t) {
             for (auto v: g.adj(u)) {
                 int fuv = f.get(u,v.first);
                 int guv = g.get(u,v.first);
-                if ((colr[v.first] == white) && (fuv < guv)) {
+                if ((colr[v.first] == WHIT) && (fuv < guv)) {
                     if (v.first==t) {
                         found = true;
                         prnt[v.first] = u;
                         break;
                     }
-                    colr[v.first] = gray;
+                    colr[v.first] = GRAY;
                     prnt[v.first] = u;
                     que.push_back(v.first);
                 }
             }
-            colr[u] = black;
+            colr[u] = BLAC;
         }
 
         if (found) {

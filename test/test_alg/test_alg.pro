@@ -17,7 +17,13 @@ SOURCES += \
     tests/sample_test.cpp \
     tests/01_sort_test.cpp \
     tests/02_rbtree_test.cpp \
-    tests/03_merge_heap.cpp
+    tests/03_merge_heap.cpp \
+    tests/04_graph_test.cpp \
+    ../../src/math/graph.cpp \
+    ../../src/math/fft.cpp \
+    ../../src/math/linear_prog.cpp \
+    ../../src/math/matalg.cpp \
+    ../../src/math/substring.cpp
 
 
 HEADERS += \
