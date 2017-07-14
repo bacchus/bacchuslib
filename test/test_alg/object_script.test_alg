@@ -1,0 +1,16 @@
+INPUT(
+./obj\main.o
+./obj\gtest-all.o
+./obj\sample_test.o
+./obj\01_sort_test.o
+./obj\02_rbtree_test.o
+./obj\03_merge_heap.o
+./obj\04_graph_test.o
+./obj\graph.o
+./obj\fft.o
+./obj\linear_prog.o
+./obj\matalg.o
+./obj\substring.o
+./obj\fib_heap.o
+./obj\05_fib_heap.o
+);

@@ -38,9 +38,9 @@ inline int bcc_log_print_impl(const char* prio, const char* file, int line, cons
 #define BCC_LOG_IMPL(LOG_LEVEL, fmt...) bcc_log_print_impl(LOG_LEVEL, __FILE__, __LINE__, fmt)
 #define BCC_LOG(LOG_LEVEL, ...) BCC_LOG_IMPL(LOG_LEVEL, __VA_ARGS__)
 
-#define LOGD(...)  BCC_LOG("D", __VA_ARGS__)
+#define LOGD(...)   BCC_LOG("D", __VA_ARGS__)
 #define LOGI(...)   BCC_LOG("I", __VA_ARGS__)
-#define LOGE(...)  BCC_LOG("E", __VA_ARGS__)
+#define LOGE(...)   BCC_LOG("E", __VA_ARGS__)
 
 #endif // ANDROID
 
