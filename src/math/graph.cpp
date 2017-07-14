@@ -244,6 +244,21 @@ std::vector<vec3i> mst_kruskal(const Graph& g) {
 }
 
 //====================================================================
+/// TODO: make with fib-heap
+/// mst_prim(Graph g, Node r)
+/// for u: g.vlist
+///     u.key = inf
+///     u.p = nil
+/// r.key = 0
+/// Q = g.vlist
+/// while Q != 0
+///     u = extract_min(Q)
+///     for v: g.adj(u)
+///         if v in Q && W(u,v) < v.key
+///             v.p = u
+///             v.key = W(u,v)
+///             // decrease_key(Q,v,W(u,v))
+// next is stupid realisation
 std::vector<vec3i> mst_prim(const Graph& g) {
     std::set<int> que(g.vlist().begin(), g.vlist().end());
     std::vector<vec3i> res;
