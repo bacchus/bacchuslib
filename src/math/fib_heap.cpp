@@ -10,7 +10,7 @@ void list_insert(FibHeap::Node* to, FibHeap::Node* x) {
 
     } else {
         to->left->right = x;
-        x->left = to->left->right;
+        x->left = to->left;
         to->left = x;
         x->right = to;
     }
@@ -96,8 +96,6 @@ FibHeap::Node* FibHeap::extract_min() {
 
         list_remove(z);
 
-        print(*this);
-
         if (z == z->right) {
             root = nullptr;
         } else {
@@ -114,17 +112,21 @@ FibHeap::Node* FibHeap::extract_min() {
 void FibHeap::consolidate() {
     std::vector<Node*> a(degree_max(), nullptr);
 
-    Node* w = root;
+    std::vector<Node*> root_list;
+    Node* node = root;
     do {
-        Node* next = w->right;
+        root_list.push_back(node);
+        node = node->right;
+    } while (node != root);
+
+    for (Node* w: root_list) {
         Node* x = w;
         int d = x->degree;
+
         while (a[d] != nullptr) {
             Node* y = a[d];
             if (x->key > y->key) {
-                Node* tmp = x;
-                x = y;
-                y = tmp;
+                std::swap(x,y);
             }
 
             link(y, x);
@@ -133,11 +135,7 @@ void FibHeap::consolidate() {
             ++d;
         }
         a[d] = x;
-
-        print(*this);
-
-        w = next;
-    } while (w != root);
+    }
 
     root = nullptr;
     for (int i = 0; i < (int)a.size(); ++i) {

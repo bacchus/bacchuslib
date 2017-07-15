@@ -42,7 +42,7 @@ void init_heap(FibHeap& heap) {
     x = nodes[12];   x->right = nodes[12];    x->left = nodes[12];
     x = nodes[13];   x->right = nodes[13];    x->left = nodes[13];
 
-    x = nodes[2];   x->child = nodes[6];    x->degree = 3;
+    x = nodes[2];   x->child = nodes[5];    x->degree = 3;
     x = nodes[5];   x->child = nodes[11];   x->degree = 1;
     x = nodes[7];   x->child = nodes[12];   x->degree = 1;
     x = nodes[3];   x->child = nodes[8];    x->degree = 1;
