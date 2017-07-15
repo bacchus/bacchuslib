@@ -6,6 +6,9 @@
 
 using namespace bacchus;
 
+std::vector<FibHeap::Node*> nodes;
+FibHeap heap;
+
 void init_heap(FibHeap& heap) {
     std::vector<int> keys = {
         23, 7,  3,          17, 24
@@ -13,7 +16,6 @@ void init_heap(FibHeap& heap) {
              , 39,     41,      35
     };
 
-    std::vector<FibHeap::Node*> nodes;
     for (int i = 0; i < (int)keys.size(); ++i) {
         nodes.push_back(new FibHeap::Node(keys[i]));
     }
@@ -66,31 +68,28 @@ void init_heap(FibHeap& heap) {
     x = nodes[9];   x->parent = nodes[4];
     x = nodes[10];   x->parent = nodes[4];
 
-    heap.insert(new FibHeap::Node(21));
 }
 
 TEST(Fibheap, Print) {
-    FibHeap heap;
     init_heap(heap);
     print(heap);
+}
 
-    //3   52
-    //    38  41
-    //    18* 39*
-    //17  30
-    //24  26* 35
-    //    46
-    //23
-    //7
-    //21
+TEST(Fibheap, Insert) {
+    heap.insert(new FibHeap::Node(21));
+    print(heap);
 }
 
 TEST(Fibheap, ExtrMin) {
-    FibHeap heap;
-    init_heap(heap);
-
     heap.extract_min();
+    print(heap);
+}
 
+TEST(Fibheap, DecKey) {
+    heap.decrease_key(nodes[10], 15);
+    print(heap);
+
+    heap.decrease_key(nodes[13], 5);
     print(heap);
 }
 
