@@ -5,6 +5,7 @@
 #include <algorithm>
 
 #include "mdefs.h"
+#include "fib_heap.h"
 #include "utils/logger.h"
 #include "utils/print.h"
 
@@ -258,6 +259,25 @@ std::vector<vec3i> mst_kruskal(const Graph& g) {
 ///             v.p = u
 ///             v.key = W(u,v)
 ///             // decrease_key(Q,v,W(u,v))
+//std::vector<vec3i> mst_prim_fib(const Graph& g, int r) {
+//    std::vector<vec2i> res(g.vlist().size(), vec2i(-1, BCC_M_INT_MAX));
+//    std::vector<int> que(g.vlist().size(), 1);
+//    res[r].y = 0;
+//    FibHeap<vec2i> q = {g.vlist()[i], res[i].y}; // key - second
+//    while (!q.empty()) {
+//        vec2i u = q.extract_min();
+//        que[u.x] = 0;
+//        for (auto v: g.adj(u)) {
+//            if (que[v.first] && u.second < res[v].y) {
+//                res[v].x = u;
+//                res[v].y = g.get(u,v);
+//                q.decrease_key(v, g.get(u,v));
+//            }
+//        }
+//    }
+//}
+
+
 // next is stupid realisation
 std::vector<vec3i> mst_prim(const Graph& g) {
     std::set<int> que(g.vlist().begin(), g.vlist().end());
