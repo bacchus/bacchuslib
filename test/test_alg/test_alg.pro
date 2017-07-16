@@ -24,7 +24,6 @@ SOURCES += \
     ../../src/math/linear_prog.cpp \
     ../../src/math/matalg.cpp \
     ../../src/math/substring.cpp \
-    ../../src/math/fib_heap.cpp \
     tests/05_fib_heap.cpp
 
 

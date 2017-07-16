@@ -11,6 +11,5 @@ INPUT(
 ./obj\linear_prog.o
 ./obj\matalg.o
 ./obj\substring.o
-./obj\fib_heap.o
 ./obj\05_fib_heap.o
 );
