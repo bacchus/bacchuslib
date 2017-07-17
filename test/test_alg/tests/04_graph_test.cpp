@@ -105,6 +105,26 @@ TEST(graph_test, MST) {
     }
 }
 
+TEST(graph_test, BellmanFord) {
+    Graph g;
+    g.insertw(0, {{1,6},{4,7}});
+    g.insertw(1, {{2,5},{3,-4},{4,8}});
+    g.insertw(2, {{1,-2}});
+    g.insertw(3, {{0,2},{2,7}});
+    g.insertw(4, {{2,-3},{3,9}});
+
+    std::vector<int> dist;
+    std::vector<int> prnt;
+    bool res = path_bellman_ford(dist,prnt, g,0);
+    EXPECT_EQ(true, res);
+
+    print_path(prnt, 0, 3);
+    std::cout << std::endl;
+
+    PRINT(dist);
+    PRINT(prnt);
+}
+
 TEST(graph_test, AllShortestPath) {
     GraphM g({
                  {0,3,8,inf,-4},

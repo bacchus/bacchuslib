@@ -109,7 +109,7 @@ std::vector<int> mst_prim_fib(const Graph& g, int r);
  *          binary nondecreasing pyramid        - O(E*lg(V))
  *          fibonachi pyramid                   - O(V*lg(V) + E)
  */
-bool path_bellman_ford(const Graph& g, int s);
+bool path_bellman_ford(std::vector<int>& dist, std::vector<int>& prnt, const Graph& g, int s);
 void path_dag(const Graph& g, int s);
 void path_dijkstra(const Graph& g, int s);
 void path_dijkstra_mm(const Graph &g, int s);

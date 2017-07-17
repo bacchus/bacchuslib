@@ -23,7 +23,7 @@ enum VisitColor {
 
 //====================================================================
 void print_path(const std::vector<int> &prnt, int s, int v) {
-    if (s == v) {
+    if (v == s) {
         std::cout << s << " ";
     } else if (prnt[v] == nil) {
         std::cout << "no way" << std::endl;
@@ -335,17 +335,16 @@ void relax(int u, int v, int w, std::vector<int>& dist, std::vector<int>& prnt) 
     }
 }
 
-bool path_bellman_ford(const Graph& g, int s) {
-    std::vector<int> prnt(g.vsize(), nil);
-    std::vector<int> dist(g.vsize(), BCC_M_INT_MAX);
+bool path_bellman_ford(std::vector<int>& dist, std::vector<int>& prnt, const Graph& g, int s) {
+    prnt = std::vector<int>(g.vsize(), nil);
+    dist = std::vector<int>(g.vsize(), BCC_M_INT_MAX);
     dist[s] = 0;
-    for (auto i: g.vlist()) {
+    for (int i = 0; i < (int)g.vlist().size()-1; ++i) {
         for (auto u: g.vlist()) {
             for (auto v: g.adj(u)) {
                 relax(u,v.first,v.second, dist,prnt);
             }
         }
-        (void)i;// suppres unused
     }
     for (auto u: g.vlist()) {
         for (auto v: g.adj(u)) {
@@ -369,6 +368,7 @@ void path_dag(const Graph& g, int s) {
     }
 }
 
+//====================================================================
 void print_path(const GraphM &prnt, int i, int j) {
     if (i==j) {
         std::cout << i << " ";
