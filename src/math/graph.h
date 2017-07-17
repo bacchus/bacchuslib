@@ -110,7 +110,7 @@ std::vector<int> mst_prim_fib(const Graph& g, int r);
  *          fibonachi pyramid                   - O(V*lg(V) + E)
  */
 bool path_bellman_ford(std::vector<int>& dist, std::vector<int>& prnt, const Graph& g, int s);
-void path_dag(const Graph& g, int s);
+void path_dag(std::vector<int>& dist, std::vector<int>& prnt, const Graph& g, int s);
 void path_dijkstra(const Graph& g, int s);
 void path_dijkstra_mm(const Graph &g, int s);
 

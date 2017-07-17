@@ -339,6 +339,7 @@ bool path_bellman_ford(std::vector<int>& dist, std::vector<int>& prnt, const Gra
     prnt = std::vector<int>(g.vsize(), nil);
     dist = std::vector<int>(g.vsize(), BCC_M_INT_MAX);
     dist[s] = 0;
+
     for (int i = 0; i < (int)g.vlist().size()-1; ++i) {
         for (auto u: g.vlist()) {
             for (auto v: g.adj(u)) {
@@ -356,10 +357,11 @@ bool path_bellman_ford(std::vector<int>& dist, std::vector<int>& prnt, const Gra
     return true;
 }
 
-void path_dag(const Graph& g, int s) {
-    std::vector<int> prnt(g.vsize(), nil);
-    std::vector<int> dist(g.vsize(), BCC_M_INT_MAX);
+void path_dag(std::vector<int>& dist, std::vector<int>& prnt, const Graph& g, int s) {
+    prnt = std::vector<int>(g.vsize(), nil);
+    dist = std::vector<int>(g.vsize(), BCC_M_INT_MAX);
     dist[s] = 0;
+
     auto sortd = topological_sort(g);
     for (auto u: sortd) {
         for (auto v: g.adj(u)) {

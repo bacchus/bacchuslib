@@ -125,6 +125,23 @@ TEST(graph_test, BellmanFord) {
     PRINT(prnt);
 }
 
+TEST(graph_test, Dag) {
+    Graph g;
+    g.insertw(0, {{1,5},{2,3}});
+    g.insertw(1, {{2,2},{3,6}});
+    g.insertw(2, {{3,7},{4,4},{5,2}});
+    g.insertw(3, {{4,-1},{5,1}});
+    g.insertw(4, {{5,-2}});
+    g.insertw(5, {});
+
+    std::vector<int> dist;
+    std::vector<int> prnt;
+    path_dag(dist,prnt, g,1);
+
+    PRINT(dist);
+    PRINT(prnt);
+}
+
 TEST(graph_test, AllShortestPath) {
     GraphM g({
                  {0,3,8,inf,-4},
