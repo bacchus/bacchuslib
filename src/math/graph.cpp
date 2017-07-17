@@ -245,37 +245,64 @@ std::vector<vec3i> mst_kruskal(const Graph& g) {
 }
 
 //====================================================================
-/// TODO: make with fib-heap
 /// mst_prim(Graph g, Node r)
-/// for u: g.vlist
-///     u.key = inf
-///     u.p = nil
-/// r.key = 0
-/// Q = g.vlist
-/// while Q != 0
-///     u = extract_min(Q)
-///     for v: g.adj(u)
-///         if v in Q && W(u,v) < v.key
-///             v.p = u
-///             v.key = W(u,v)
-///             // decrease_key(Q,v,W(u,v))
-//std::vector<vec3i> mst_prim_fib(const Graph& g, int r) {
-//    std::vector<vec2i> res(g.vlist().size(), vec2i(-1, BCC_M_INT_MAX));
-//    std::vector<int> que(g.vlist().size(), 1);
-//    res[r].y = 0;
-//    FibHeap<vec2i> q = {g.vlist()[i], res[i].y}; // key - second
-//    while (!q.empty()) {
-//        vec2i u = q.extract_min();
-//        que[u.x] = 0;
-//        for (auto v: g.adj(u)) {
-//            if (que[v.first] && u.second < res[v].y) {
-//                res[v].x = u;
-//                res[v].y = g.get(u,v);
-//                q.decrease_key(v, g.get(u,v));
-//            }
-//        }
-//    }
-//}
+std::vector<int> mst_prim_fib(const Graph& g, int r) {
+    const int n = g.vlist().size();
+
+    // i-vetr, parent
+    std::vector<int> res(n, -1);
+
+    /// for u: g.vlist
+    ///     u.key = inf
+    ///     u.p = nil
+    // i-vetr, vec2i(vert, key)
+    std::vector<vec2i> ver_wei_inq(n, vec2i(-1, BCC_M_INT_MAX));
+
+    /// r.key = 0
+    ver_wei_inq[r].y = 0;
+
+    /// Q = g.vlist
+    typedef FibHeap<vec2i> Que;
+    Que que([](vec2i a, vec2i b){ return a.y < b.y; });
+
+    std::vector<Que::Node*> nodes(n, nullptr);
+    for (int i = 0; i < n; ++i) {
+        ver_wei_inq[i].x = i;
+        Que::Node* node = new Que::Node(ver_wei_inq[i]);
+        que.insert(node);
+        nodes[i] = node;
+    }
+
+    /// while Q != 0
+    while (!que.empty()) {
+        ///     u = extract_min(Q)
+        Que::Node* node = que.extract_min();
+        vec2i u = node->key;
+        delete node;
+        nodes[u.x] = nullptr;
+
+        /// for v: g.adj(u)
+        for (auto vw: g.adj(u.x)) {
+
+            int v = vw.first;    // v
+            int w = vw.second;   // W(u,v)
+
+            /// if v in Q && W(u,v) < v.key
+            if (nodes[v] != nullptr && w < ver_wei_inq[v].y) {
+                /// v.p = u
+                res[v] = u.x;
+
+                /// v.key = W(u,v)
+                ver_wei_inq[v].y = w;
+
+                /// decrease_key(Q,v,W(u,v))
+                que.decrease_key(nodes[v], vec2i(v,w));
+            }
+        }
+    }
+
+    return res;
+}
 
 
 // next is stupid realisation

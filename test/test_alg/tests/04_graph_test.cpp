@@ -81,6 +81,7 @@ TEST(graph_test, MST) {
         std::for_each(q.begin(), q.end(), [&sum](decltype(*q.begin()) x){sum+=x.z;});
         std::cout << "sum: " << sum;
         PRINT(q);
+        EXPECT_EQ(37, sum);
     }
 
     {
@@ -89,6 +90,18 @@ TEST(graph_test, MST) {
         std::for_each(prim.begin(), prim.end(), [&sum](decltype(*prim.begin()) x){sum+=x.z;});
         std::cout << "sum: " << sum;
         PRINT(prim);
+        EXPECT_EQ(37, sum);
+    }
+
+    {
+        int sum = 0;
+        std::vector<int> fib = mst_prim_fib(g,0);
+        for (int i = 1; i < (int)fib.size(); ++i) {
+            sum += g.get(i,fib[i]);
+        }
+        std::cout << "sum: " << sum;
+        PRINT(fib);
+        EXPECT_EQ(37, sum);
     }
 }
 

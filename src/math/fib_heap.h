@@ -88,6 +88,14 @@ public:
         return root;
     }
 
+    int size() const {
+        return n;
+    }
+
+    bool empty() const {
+        return n == 0;
+    }
+
     void merge(FibHeap<T>* h2) {
         if (h2->root != nullptr) {
 

@@ -98,6 +98,7 @@ void strongly_connectes_components(const Graph& g);
 // wheighted nonoriented minimal spanning tree
 std::vector<vec3i> mst_kruskal(const Graph& g);
 std::vector<vec3i> mst_prim(const Graph& g);
+std::vector<int> mst_prim_fib(const Graph& g, int r);
 
 /* wheighted oriented graph shortest path
  * if w < 0, negative cycles    - Bellman-Ford  - O(V*E)
