@@ -17,9 +17,9 @@ TEST(graph_test, BFS_DFS) {
     g.insert(6, {4,5,7});
     g.insert(7, {5,6});
 
-    std::vector<int> dist(g.vsize(), BCC_M_INT_MAX);
-    std::vector<int> prnt(g.vsize(), nil);
-    std::vector<int> colr(g.vsize(), 0);//white
+    std::vector<int> dist(g.size(), BCC_M_INT_MAX);
+    std::vector<int> prnt(g.size(), nil);
+    std::vector<int> colr(g.size(), 0);//white
     bfs(g, 2, dist, prnt, colr);
 
     PRINT(dist);
@@ -95,9 +95,9 @@ TEST(graph_test, MST) {
 
     {
         int sum = 0;
-        std::vector<int> fib = mst_prim_fib(g,0);
+        std::vector<vec3i> fib = mst_prim_fib(g,0);
         for (int i = 1; i < (int)fib.size(); ++i) {
-            sum += g.get(i,fib[i]);
+            sum += g.get(fib[i].x, i);
         }
         std::cout << "sum: " << sum;
         PRINT(fib);
@@ -113,16 +113,14 @@ TEST(graph_test, BellmanFord) {
     g.insertw(3, {{0,2},{2,7}});
     g.insertw(4, {{2,-3},{3,9}});
 
-    std::vector<int> dist;
-    std::vector<int> prnt;
-    bool res = path_bellman_ford(dist,prnt, g,0);
+    std::vector<vec3i> prnt_ver_dist;
+    bool res = path_bellman_ford(prnt_ver_dist, g,0);
     EXPECT_EQ(true, res);
 
-    print_path(prnt, 0, 3);
+    print_path(prnt_ver_dist, 0, 3);
     std::cout << std::endl;
 
-    PRINT(dist);
-    PRINT(prnt);
+    PRINT(prnt_ver_dist);
 }
 
 TEST(graph_test, Dag) {
@@ -134,12 +132,39 @@ TEST(graph_test, Dag) {
     g.insertw(4, {{5,-2}});
     g.insertw(5, {});
 
-    std::vector<int> dist;
-    std::vector<int> prnt;
-    path_dag(dist,prnt, g,1);
+    std::vector<vec3i> prnt_vert_dist;
+    path_dag(prnt_vert_dist, g,1);
 
-    PRINT(dist);
-    PRINT(prnt);
+    PRINT(prnt_vert_dist);
+}
+
+//TEST(graph_test, Dijkstra) {
+//    Graph g;
+//    g.insertw(0, {{1,16},{2,13}});
+//    g.insertw(1, {{2,10},{3,12}});
+//    g.insertw(2, {{4,14}});
+//    g.insertw(3, {{2,9},{5,20}});
+//    g.insertw(4, {{5,4}});
+//    g.insertw(5, {});
+
+//    path_dijkstra(g,0);
+//    path_dijkstra_mm(g,0);
+//}
+
+TEST(graph_test, Dijkstra) {
+    Graph g;
+    g.insertw(0, {{1,10},{4,5}});
+    g.insertw(1, {{2,1},{4,2}});
+    g.insertw(2, {{3,4}});
+    g.insertw(3, {{0,7},{2,6}});
+    g.insertw(4, {{1,3},{2,9},{3,2}});
+
+    std::vector<vec3i> prnt_vert_dist;
+    path_dijkstra_fib(prnt_vert_dist, g,0);
+    PRINT(prnt_vert_dist);
+
+    path_dijkstra(g,0);
+    path_dijkstra_mm(g,0);
 }
 
 TEST(graph_test, AllShortestPath) {
@@ -187,19 +212,6 @@ TEST(graph_test, FordFlukersonDegenerate) {
     g.insertw(3, {});
 
     ford_fulkerson(g, 0, 3);
-}
-
-TEST(graph_test, Dijkstra) {
-    Graph g;
-    g.insertw(0, {{1,16},{2,13}});
-    g.insertw(1, {{2,10},{3,12}});
-    g.insertw(2, {{4,14}});
-    g.insertw(3, {{2,9},{5,20}});
-    g.insertw(4, {{5,4}});
-    g.insertw(5, {});
-
-    path_dijkstra(g,0);
-    path_dijkstra_mm(g,0);
 }
 
 #endif

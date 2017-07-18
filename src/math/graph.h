@@ -28,8 +28,8 @@ public:
     Graph(Graph&&) = default;
     Graph& operator=(Graph&&) = default;
 
-    int vsize() const {
-        return m_data.size();
+    int size() const {
+        return m_vlist.size();
     }
 
     const std::map<int,int>& adj(int v) const {
@@ -85,6 +85,7 @@ inline std::ostream& operator <<(std::ostream& ostr, const Graph& mat) {
 
 // general algs for any graphs
 void print_path(const std::vector<int>& parnt, int s, int v);
+void print_path(const std::vector<vec3i> &prnt_vert_dist, int s, int v);
 void bfs(const Graph& g, int s, std::vector<int>& dist, std::vector<int>& prnt, std::vector<int>& colr);// O(V + E)
 void dfs(const Graph& g);// O(V + E)
 
@@ -97,8 +98,8 @@ void strongly_connectes_components(const Graph& g);
 
 // wheighted nonoriented minimal spanning tree
 std::vector<vec3i> mst_kruskal(const Graph& g);
-std::vector<vec3i> mst_prim(const Graph& g);
-std::vector<int> mst_prim_fib(const Graph& g, int r);
+std::vector<vec3i> mst_prim(const Graph& g);  /// TODO: deprecated, use _fib
+std::vector<vec3i> mst_prim_fib(const Graph& g, int r);
 
 /* wheighted oriented graph shortest path
  * if w < 0, negative cycles    - Bellman-Ford  - O(V*E)
@@ -109,10 +110,11 @@ std::vector<int> mst_prim_fib(const Graph& g, int r);
  *          binary nondecreasing pyramid        - O(E*lg(V))
  *          fibonachi pyramid                   - O(V*lg(V) + E)
  */
-bool path_bellman_ford(std::vector<int>& dist, std::vector<int>& prnt, const Graph& g, int s);
-void path_dag(std::vector<int>& dist, std::vector<int>& prnt, const Graph& g, int s);
-void path_dijkstra(const Graph& g, int s);
-void path_dijkstra_mm(const Graph &g, int s);
+bool path_bellman_ford(std::vector<vec3i>& prnt_vert_dist, const Graph& g, int s);
+void path_dag(std::vector<vec3i>& prnt_vert_dist, const Graph& g, int s);
+void path_dijkstra_fib(std::vector<vec3i>& prnt_vert_dist, const Graph& g, int s);
+void path_dijkstra(const Graph& g, int s);      /// TODO: deprecated, use _fib
+void path_dijkstra_mm(const Graph &g, int s);   /// TODO: deprecated, use _fib
 
 
 class GraphM {
