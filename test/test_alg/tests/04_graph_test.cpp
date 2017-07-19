@@ -63,6 +63,7 @@ TEST(graph_test, SCC) {
     strongly_connectes_components(g);
 }
 
+//====================================================================
 TEST(graph_test, MST) {
     Graph g;
     g.insertw(0, {{1,4},{7,8}});
@@ -105,6 +106,7 @@ TEST(graph_test, MST) {
     }
 }
 
+//====================================================================
 TEST(graph_test, BellmanFord) {
     Graph g;
     g.insertw(0, {{1,6},{4,7}});
@@ -113,14 +115,17 @@ TEST(graph_test, BellmanFord) {
     g.insertw(3, {{0,2},{2,7}});
     g.insertw(4, {{2,-3},{3,9}});
 
-    std::vector<vec3i> prnt_ver_dist;
-    bool res = path_bellman_ford(prnt_ver_dist, g,0);
-    EXPECT_EQ(true, res);
+    std::vector<vec3i> prnt_vert_dist;
+    bool res = path_bellman_ford(prnt_vert_dist, g,0);
 
-    print_path(prnt_ver_dist, 0, 3);
+    EXPECT_EQ(true, res);
+    int sum = 0; for (const vec3i& v: prnt_vert_dist) sum += v.z;
+    EXPECT_EQ(11, sum);
+
+    print_path(prnt_vert_dist, 0, 3);
     std::cout << std::endl;
 
-    PRINT(prnt_ver_dist);
+    PRINT(prnt_vert_dist);
 }
 
 TEST(graph_test, Dag) {
@@ -134,6 +139,11 @@ TEST(graph_test, Dag) {
 
     std::vector<vec3i> prnt_vert_dist;
     path_dag(prnt_vert_dist, g,1);
+
+    EXPECT_LT(100, prnt_vert_dist[0].z);
+    prnt_vert_dist[0].z = 0;
+    int sum = 0; for (const vec3i& v: prnt_vert_dist) sum += v.z;
+    EXPECT_EQ(16, sum);
 
     PRINT(prnt_vert_dist);
 }
@@ -162,11 +172,14 @@ TEST(graph_test, Dijkstra) {
     std::vector<vec3i> prnt_vert_dist;
     path_dijkstra_fib(prnt_vert_dist, g,0);
     PRINT(prnt_vert_dist);
+    int sum = 0; for (const vec3i& v: prnt_vert_dist) sum += v.z;
+    EXPECT_EQ(29, sum);
 
     path_dijkstra(g,0);
     path_dijkstra_mm(g,0);
 }
 
+//====================================================================
 TEST(graph_test, AllShortestPath) {
     GraphM g({
                  {0,3,8,inf,-4},
@@ -192,6 +205,7 @@ TEST(graph_test, AllShortestPath) {
     LNEND();
 }
 
+//====================================================================
 TEST(graph_test, FordFlukerson) {
     Graph g;
     g.insertw(0, {{1,16},{2,13}});
