@@ -117,7 +117,7 @@ public:
             list_merge(root, z->child);
         }
 
-        list_remove(z.get());
+        list_remove(z.get()); //BCC: prnt list
 
         if (z.get() == z->right) {
             root = nullptr;
@@ -262,7 +262,7 @@ private:
     }
 
     int degree_max() {
-        return 2.08f*std::log(n);//2.08 ~ 1/log(golden_ratio)
+        return 1 + 2.08f*std::log(n);//2.08 ~ 1/log(golden_ratio)
     }
 
     void clear(Node* node) {
@@ -318,41 +318,42 @@ public:
 };
 
 template<class Key, class T, class Compare>
-void print(const typename FibHeap<Key,T,Compare>::Node* node, int tab=1) {
-    std::cout << node->data.first << ":" << node->data.second;
+inline void print_fib_heap_node(std::ostream& os, const typename FibHeap<Key,T,Compare>::Node* node, int tab=1) {
+    os << node->data.first << ":" << node->data.second;
 
     if (node->mark)
-        std::cout << "*";
+        os << "*";
 
     typename FibHeap<Key,T,Compare>::Node* x = node->child;
     if (x) {
-        std::cout << "\t";
-        print<Key,T,Compare>(x);
+        os << "\t";
+        print_fib_heap_node<Key,T,Compare>(os, x);
 
         if (x != x->right) {
             do {
-                std::cout << std::endl;
+                os << std::endl;
                 for (int i = 0; i < tab; ++i) {
-                    std::cout << "\t";
+                    os << "\t";
                 }
 
                 x = x->right;
-                print<Key,T,Compare>(x, tab+1);
+                print_fib_heap_node<Key,T,Compare>(os, x, tab+1);
             } while (x->right != node->child);
         }
     }
 }
 
 template<class Key, class T, class Compare>
-void print(const FibHeap<Key, T, Compare>& heap) {
+inline std::ostream& operator <<(std::ostream& os, const FibHeap<Key,T,Compare>& heap) {
     typename FibHeap<Key,T,Compare>::Node* x = heap.root;
     do {
-        print<Key,T,Compare>(x);
-        std::cout << std::endl;
+        print_fib_heap_node<Key,T,Compare>(os, x);
+        os << std::endl;
 
         x = x->right;
     } while (x != heap.root);
-    std::cout << std::endl;
+    os << std::endl;
+    return os;
 }
 
 } // namespace bacchus

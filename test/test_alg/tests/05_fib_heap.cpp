@@ -74,25 +74,25 @@ void init_heap(FibHeap<int>& heap) {
 
 TEST(Fibheap, Print) {
     init_heap(heap);
-    print(heap);
+    std::cout << heap << std::endl;
 }
 
 TEST(Fibheap, Insert) {
     heap.insert(21);
-    print(heap);
+    std::cout << heap << std::endl;
 }
 
 TEST(Fibheap, ExtrMin) {
     EXPECT_EQ(3, heap.extract_min().first);
-    print(heap);
+    std::cout << heap << std::endl;
 }
 
 TEST(Fibheap, DecKey) {
     heap.decrease_key(nodes[10], 15);
-    print(heap);
+    std::cout << heap << std::endl;
 
     heap.decrease_key(nodes[13], 5);
-    print(heap);
+    std::cout << heap << std::endl;
 }
 
 TEST(Fibheap, Clear) {

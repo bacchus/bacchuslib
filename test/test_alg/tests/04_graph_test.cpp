@@ -17,9 +17,9 @@ TEST(graph_test, BFS_DFS) {
     g.insert(6, {4,5,7});
     g.insert(7, {5,6});
 
-    std::vector<int> dist(g.size(), BCC_M_INT_MAX);
-    std::vector<int> prnt(g.size(), nil);
-    std::vector<int> colr(g.size(), 0);//white
+    std::vector<int> dist(g.vsize(), BCC_M_INT_MAX);
+    std::vector<int> prnt(g.vsize(), nil);
+    std::vector<int> colr(g.vsize(), 0);//white
     bfs(g, 2, dist, prnt, colr);
 
     PRINT(dist);
@@ -187,7 +187,7 @@ TEST(graph_test, AllShortestPath) {
                  {inf,4,0,inf,inf},
                  {2,inf,-5,0,inf},
                  {inf,inf,inf,6,0}
-            });
+             });
     GraphM res = get_allpairs_path(g);
     std::cout << "all pairs\n" << res << std::endl;
 
@@ -203,6 +203,21 @@ TEST(graph_test, AllShortestPath) {
     std::cout << "path 2 -> 0" << std::endl;
     print_path(res, 2, 0);
     LNEND();
+}
+
+TEST(graph_test, Johnson) {
+    Graph g;
+    g.insertw(0, {{1,3},{2,8},{4,-4}});
+    g.insertw(1, {{3,1},{4,7}});
+    g.insertw(2, {{1,4}});
+    g.insertw(3, {{0,2},{2,-5}});
+    g.insertw(4, {{3,6}});
+
+    GraphM res;
+    bool success = johnson(res, g);
+    std::cout << res << std::endl;
+
+    EXPECT_EQ(true, success);
 }
 
 //====================================================================

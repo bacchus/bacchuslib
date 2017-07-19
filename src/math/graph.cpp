@@ -19,8 +19,6 @@ enum VisitColor {
     BLAC = 2// processed
 };
 
-//const int nil = -1;// points to no
-
 //====================================================================
 void print_path(const std::vector<int> &prnt, int s, int v) {
     if (v == s) {
@@ -43,6 +41,16 @@ void print_path(const std::vector<vec3i> &prnt_vert_dist, int s, int v) {
         std::cout << v << " ";
     }
 }
+
+int dist_path(const Graph& g, const std::vector<vec3i> &prnt_vert_dist, int s, int v) {
+    if (v == s) {
+        return 0;
+    } else if (prnt_vert_dist[v].x == nil) {
+        return inf;
+    } else {
+        return g.get(prnt_vert_dist[v].x, v) + dist_path(g, prnt_vert_dist, s, prnt_vert_dist[v].x);
+    }
+}
 //====================================================================
 void bfs(const Graph& g, int s
          , std::vector<int>& dist
@@ -51,7 +59,7 @@ void bfs(const Graph& g, int s
          )
 {
 //    std::vector<int> colr(g.vsize(), white);
-//    std::vector<int> dist(g.vsize(), BCC_M_INT_MAX);
+//    std::vector<int> dist(g.vsize(), inf);
 //    std::vector<int> prnt(g.vsize(), nil);
 
 //    colr.clear();
@@ -59,8 +67,8 @@ void bfs(const Graph& g, int s
 //    prnt.clear();
 
 //    colr.resize(g.vsize(), white);
-//    dist.resize(g.vsize(), BCC_M_INT_MAX);
-//    prnt.resize(g.vsize(), -1);
+//    dist.resize(g.vsize(), inf);
+//    prnt.resize(g.vsize(), nil);
 
     colr[s] = GRAY;
     dist[s] = 0;
@@ -84,9 +92,9 @@ void bfs(const Graph& g, int s
 
 //====================================================================
 void find_undirected_connected_components(const Graph& g) {
-    std::vector<int> dist(g.size(), BCC_M_INT_MAX);
-    std::vector<int> prnt(g.size(), nil);
-    std::vector<int> colr(g.size(), WHIT);
+    std::vector<int> dist(g.vsize(), inf);
+    std::vector<int> prnt(g.vsize(), nil);
+    std::vector<int> colr(g.vsize(), WHIT);
 
     std::cout << "cc: ";
     for (auto v: g.vlist()) {
@@ -123,10 +131,10 @@ void dfs_visit(const Graph& g, int u, int& t
 }
 
 void dfs(const Graph& g) {
-    std::vector<int> colr(g.size(), WHIT);
-    std::vector<int> prnt(g.size(), nil);
-    std::vector<int> dist(g.size(), 0);
-    std::vector<int> finl(g.size(), 0);
+    std::vector<int> colr(g.vsize(), WHIT);
+    std::vector<int> prnt(g.vsize(), nil);
+    std::vector<int> dist(g.vsize(), 0);
+    std::vector<int> finl(g.vsize(), 0);
 //    std::deque<int> sortd;
     int t = 0;
     for (auto u: g.vlist()) {
@@ -170,10 +178,10 @@ void sort_dfs_visit(const Graph& g, int u, int& t
 }
 
 std::deque<int> topological_sort(const Graph& g) {
-    std::vector<int> colr(g.size(), WHIT);
-    std::vector<int> prnt(g.size(), nil);
-    std::vector<int> dist(g.size(), 0);
-    std::vector<int> finl(g.size(), 0);
+    std::vector<int> colr(g.vsize(), WHIT);
+    std::vector<int> prnt(g.vsize(), nil);
+    std::vector<int> dist(g.vsize(), 0);
+    std::vector<int> finl(g.vsize(), 0);
     std::deque<int> sortd;
     int t = 0;
     for (auto u: g.vlist()) {
@@ -202,10 +210,10 @@ void strongly_connectes_components(const Graph& g) {
     std::cout << std::endl;
     Graph tr = transpose(g);
 
-    std::vector<int> colr(g.size(), WHIT);
-    std::vector<int> prnt(g.size(), nil);
-    std::vector<int> dist(g.size(), 0);
-    std::vector<int> finl(g.size(), 0);
+    std::vector<int> colr(g.vsize(), WHIT);
+    std::vector<int> prnt(g.vsize(), nil);
+    std::vector<int> dist(g.vsize(), 0);
+    std::vector<int> finl(g.vsize(), 0);
     int t = 0;
     for (auto u: gsortd) {
         if (colr[u]==WHIT) {
@@ -231,7 +239,7 @@ std::vector<vec3i> mst_kruskal(const Graph& g) {
 
     // make sets of verts - for v in vlist: make-set(v)
     int i = 0;
-    std::vector<int> sets(g.size());
+    std::vector<int> sets(g.vsize());
     std::generate(sets.begin(), sets.end(), [&i](){return i++;});
 
     // visit edges in weight order
@@ -257,13 +265,13 @@ std::vector<vec3i> mst_kruskal(const Graph& g) {
 //====================================================================
 /// mst_prim(Graph g, Node r)
 std::vector<vec3i> mst_prim_fib(const Graph& g, int r) {
-    const int n = g.size();
+    const int n = g.vsize();
 
     /// for u: g.vlist
     ///     u.key = inf
     ///     u.p = nil
     // i-vetr, vec3i(prnt, vert, key)
-    std::vector<vec3i> prnt_vert_dist(n, vec3i(-1, -1, BCC_M_INT_MAX));
+    std::vector<vec3i> prnt_vert_dist(n, vec3i(nil, nil, inf));
 
     /// r.key = 0
     prnt_vert_dist[r].z = 0;
@@ -312,7 +320,7 @@ std::vector<vec3i> mst_prim(const Graph& g) {
     std::vector<vec3i> res;
     que.erase(0);
     while (!que.empty()) {
-        vec3i minv(BCC_M_INT_MAX);
+        vec3i minv(inf);
         for (auto v: que) {
             for (auto u: g.adj(v)) {
                 if (!que.count(u.first) && u.second < minv.z) {
@@ -340,13 +348,13 @@ bool relax(int u, int v, int w, std::vector<vec3i>& prnt_vert_dist) {
 
 bool path_bellman_ford(std::vector<vec3i>& prnt_vert_dist, const Graph& g, int s) {
     // i-vetr, vec3i(prnt, vert, key)
-    const int n = g.size();
-    prnt_vert_dist = std::vector<vec3i>(n, vec3i(-1, -1, BCC_M_INT_MAX));
+    const int n = g.vsize();
+    prnt_vert_dist = std::vector<vec3i>(n, vec3i(nil, nil, inf));
     for (int i = 0; i < n; ++i)
         prnt_vert_dist[i].y = i;
     prnt_vert_dist[s].z = 0;
 
-    for (int i = 0; i < g.size()-1; ++i) {
+    for (uint i = 0; i < g.vsize()-1; ++i) {
         for (auto u: g.vlist()) {
             for (auto v: g.adj(u)) {
                 relax(u,v.first,v.second, prnt_vert_dist);
@@ -365,8 +373,8 @@ bool path_bellman_ford(std::vector<vec3i>& prnt_vert_dist, const Graph& g, int s
 
 void path_dag(std::vector<vec3i>& prnt_vert_dist, const Graph& g, int s) {
     // i-vetr, vec3i(prnt, vert, key)
-    const int n = g.size();
-    prnt_vert_dist = std::vector<vec3i>(n, vec3i(-1, -1, BCC_M_INT_MAX));
+    const int n = g.vsize();
+    prnt_vert_dist = std::vector<vec3i>(n, vec3i(nil, nil, inf));
     for (int i = 0; i < n; ++i)
         prnt_vert_dist[i].y = i;
     prnt_vert_dist[s].z = 0;
@@ -383,8 +391,8 @@ void path_dag(std::vector<vec3i>& prnt_vert_dist, const Graph& g, int s) {
 /// path_dijkstra_fib(Graph g, Node s)
 void path_dijkstra_fib(std::vector<vec3i>& prnt_vert_dist, const Graph& g, int s) {
     // i-vetr, vec3i(prnt, vert, key)
-    const int n = g.size();
-    prnt_vert_dist = std::vector<vec3i>(n, vec3i(-1, -1, BCC_M_INT_MAX));
+    const int n = g.vsize();
+    prnt_vert_dist = std::vector<vec3i>(n, vec3i(nil, nil, inf));
     for (int i = 0; i < n; ++i)
         prnt_vert_dist[i].y = i;
     prnt_vert_dist[s].z = 0;
@@ -401,6 +409,8 @@ void path_dijkstra_fib(std::vector<vec3i>& prnt_vert_dist, const Graph& g, int s
     /// while Q != 0
     while (!que.empty()) {
         /// u = extract_min(Q)
+//        std::cout << "size: " << que.size() << std::endl;
+//        std::cout << que << std::endl;
         vec2i u = que.extract_min().second;
         nodes[u.y] = nullptr;
 
@@ -422,8 +432,8 @@ void path_dijkstra(const Graph &g, int s) {
     std::set<int> vlist = g.vlist();
     vlist.erase(s);
 
-    std::vector<int> prnt(g.size(), nil);
-    std::vector<int> dist(g.size(), BCC_M_INT_MAX);
+    std::vector<int> prnt(g.vsize(), nil);
+    std::vector<int> dist(g.vsize(), inf);
     dist[s] = 0;
 
     std::list<vec3i> edges;
@@ -454,8 +464,8 @@ void path_dijkstra_mm(const Graph &g, int s) {
     std::set<int> vlist = g.vlist();
     vlist.erase(s);
 
-    std::vector<int> prnt(g.size(), nil);
-    std::vector<int> dist(g.size(), BCC_M_INT_MAX);
+    std::vector<int> prnt(g.vsize(), nil);
+    std::vector<int> dist(g.vsize(), inf);
     dist[s] = 0;
 
     std::multimap<int, vec2i> edges;
@@ -501,7 +511,7 @@ GraphM extend_shortest_path(const GraphM &l, const GraphM &w) {
     GraphM l2(n);
     for (uint i = 0; i < n; ++i) {
         for (uint j = 0; j < n; ++j) {
-            l2(i,j) = BCC_M_INT_MAX;
+            l2(i,j) = inf;
             for (uint k = 0; k < n; ++k) {
                 l2(i,j) = std::min(l2(i,j), l(i,k) + w(k,j));
             }
@@ -510,6 +520,10 @@ GraphM extend_shortest_path(const GraphM &l, const GraphM &w) {
     return l2;
 }
 
+// O(n^4)
+//    for (uint m = 2; m < n; ++m) {
+//        l = extend_shortest_path(l,w);
+//    }
 GraphM get_allpairs_path(const GraphM &w) {
     uint n = w.vsize();
     GraphM dist(w);
@@ -518,10 +532,6 @@ GraphM get_allpairs_path(const GraphM &w) {
         dist = extend_shortest_path(dist,dist);
         m *= 2;
     }
-    // O(n^4)
-//    for (uint m = 2; m < n; ++m) {
-//        l = extend_shortest_path(l,w);
-//    }
     return dist;
 }
 
@@ -588,6 +598,54 @@ GraphM transitive_closure(const GraphM &w) {
     return trns;
 }
 
+bool johnson(GraphM& res, const Graph& g) {
+    uint n = g.vsize();
+    int s = n;
+
+    /// G2.V = G.V U {s}
+    /// G2.E = G.E U {(s,v): v in G.V, w(s,v)=0}
+    Graph g2(g);
+    g2.addv(s);
+    for (auto v: g.vlist()) {
+        g2.adde(s,v,0);
+    }
+
+    /// bellman_ford
+    std::vector<vec3i> bf_prnt_vert_dist;
+    bool success = path_bellman_ford(bf_prnt_vert_dist, g2, s);
+
+    if (success) {
+        /// h(v) = d(s,v)
+        std::vector<int> h(n+1);
+        for (uint i = 0; i < h.size(); ++i) {
+            h[i] = dist_path(g2, bf_prnt_vert_dist, s, i);
+        }
+
+        /// w2(u,v) = w(u,v) + h(u) - h(v)
+        for (auto u: g2.vlist()) {
+            for (auto v: g2.adj(u)) {
+                g2.set(u,v.first, v.second + h[u] - h[v.first]);
+            }
+        }
+
+        /// init D[n x n]
+        res = GraphM(n);
+
+        /// for u in G.V: d2(u,v) = dijkstra(G, w2, u)
+        for (auto u: g.vlist()) {
+            std::vector<vec3i> dj_prnt_vert_dist;
+            path_dijkstra_fib(dj_prnt_vert_dist, g2, u);
+            /// for v in G.V: D(u,v) = d2(u,v) + h(v) - h(u)
+            for (auto v: g.vlist()) {
+                res(u,v) = dj_prnt_vert_dist[v].z + h[v] - h[u];
+            }
+        }
+    }
+
+    return success;
+}
+
+//====================================================================
 void ford_fulkerson(const Graph &g, int s, int t) {
     Graph f;
     for (auto v: g.vlist()) {
@@ -601,8 +659,8 @@ void ford_fulkerson(const Graph &g, int s, int t) {
     int n = 0;
     while (found) {
         found = false;
-        std::vector<int> colr(g.size(), WHIT); colr[s] = GRAY;
-        std::vector<int> prnt(g.size(), nil); prnt[s] = nil;
+        std::vector<int> colr(g.vsize(), WHIT); colr[s] = GRAY;
+        std::vector<int> prnt(g.vsize(), nil); prnt[s] = nil;
         std::deque<int> que{s};
         while (!que.empty() && !found) {
             int u = que.front();
@@ -625,7 +683,7 @@ void ford_fulkerson(const Graph &g, int s, int t) {
         }
 
         if (found) {
-            int minc = BCC_M_INT_MAX;
+            int minc = inf;
             {
                 int v = t;
                 while (v != s) {
@@ -655,8 +713,7 @@ void ford_fulkerson(const Graph &g, int s, int t) {
     std::cout << f << std::endl;
 }
 
-
-
+//====================================================================
 // push flows
 bool push(const Graph &g, int u, int v
           , Graph &d
@@ -677,7 +734,7 @@ bool push(const Graph &g, int u, int v
 }
 
 bool relabel(const Graph &g, int u, std::vector<int>& h) {
-    int minhv = BCC_M_INT_MAX;
+    int minhv = inf;
     for (auto v: g.adj(u)) {
         if (h[u] > h[v.first]) return false;
         if (h[v.first] < minhv) minhv = h[v.first];
@@ -699,7 +756,7 @@ void init_preflow(const Graph &g, int s
             f.set(v.first,u,0);
         }
     }
-    h[s] = g.size();
+    h[s] = g.vsize();
     for (auto u: g.adj(s)) {
         int csu = u.second;
         f.set(s,u.first, csu);
@@ -710,7 +767,7 @@ void init_preflow(const Graph &g, int s
 }
 
 void generic_push_relabel(const Graph &g, int s, int t) {
-    int n = g.size();
+    int n = g.vsize();
     std::vector<int> h(n,0);
     std::vector<int> e(n,0);
     Graph d;
