@@ -1,6 +1,7 @@
 #include "setting.h"
 
 #include "math/fib_heap.h"
+#include "utils/leak.h"
 
 #if TEST_05_FIBHEA
 
@@ -16,6 +17,7 @@ void init_heap(FibHeap<int>& heap) {
              , 39,     41,      35
     };
 
+    nodes.clear();
     for (int i = 0; i < (int)keys.size(); ++i) {
         nodes.push_back(new FibHeap<int>::Node(keys[i]));
     }
@@ -76,12 +78,12 @@ TEST(Fibheap, Print) {
 }
 
 TEST(Fibheap, Insert) {
-    heap.insert(new FibHeap<int>::Node(21));
+    heap.insert(21);
     print(heap);
 }
 
 TEST(Fibheap, ExtrMin) {
-    heap.extract_min();
+    EXPECT_EQ(3, heap.extract_min().first);
     print(heap);
 }
 
@@ -91,6 +93,39 @@ TEST(Fibheap, DecKey) {
 
     heap.decrease_key(nodes[13], 5);
     print(heap);
+}
+
+TEST(Fibheap, Clear) {
+    heap.clear();
+    EXPECT_EQ(0, heap.n);
+}
+
+TEST(Fibheap, ClearByExtr) {
+    FibHeap<int> heap;
+    init_heap(heap);
+    while (!heap.empty()) {
+        heap.extract_min();
+    }
+    EXPECT_EQ(0, heap.n);
+}
+
+TEST(Fibheap, Leaker) {
+    Leak::zero();
+    FibHeap<int, Leak> heap;
+
+    for (int i = 0; i < 100; ++i) {
+        heap.insert(i);
+    }
+
+    for (int i = 0; i < 10; ++i) {
+        heap.extract_min();
+    }
+
+    heap.clear();
+    //heap.clear_slow();
+
+    EXPECT_EQ(0, heap.n);
+    EXPECT_EQ(0, Leak::num());
 }
 
 #endif

@@ -1,22 +1,27 @@
 #pragma once
 
-#include <iostream>
+#include "utils/except.h"
+
 #include <cassert>
-#include <vector>
 #include <cmath>
 #include <functional>
+#include <iostream>
+#include <memory>
+#include <vector>
 
 namespace bacchus {
 
 //====================================================================
-template<class Key, class T, class Compare = std::less<Key>>
+template<class Key, class T = char, class Compare = std::less<Key>>
 class FibHeap {
 public:
+
+    typedef std::pair<Key,T> value_type;
 
     class Node {
     public:
         Node(const Key& k, const T& v = T())
-            : key(k), value(v)
+            : data(k,v)
         {}
 
         Node* parent = nullptr;
@@ -27,15 +32,23 @@ public:
         int degree = 0;
         bool mark = false;
 
-        Key key;
-        T value;
+        value_type data;
     };
 
-    FibHeap(const Compare& c = Compare()): comp(c) {}
+    FibHeap(const Compare& c = Compare())
+        : comp(c)
+    {
 
-    ~FibHeap() {}
+    }
 
-    void insert(Node* x) {
+    ~FibHeap() {
+        //clear_slow();
+        clear();
+    }
+
+    Node* insert(const Key& key, const T& val = T()) {
+        Node* x = new Node(key, val);
+
         x->degree = 0;
         x->parent = nullptr;
         x->child = nullptr;
@@ -45,11 +58,12 @@ public:
 
         if (root == nullptr) {
             root = x;
-        } else if (comp(x->key, root->key)) {
+        } else if (compare(x, root)) {
             root = x;
         }
 
         ++n;
+        return x;
     }
 
     Node* minimum() const {
@@ -83,59 +97,82 @@ public:
         }
     }
 
-    Node* extract_min() {
-        Node* z = root;
+    value_type extract_min() {
+        std::unique_ptr<Node> z(root);
 
-        if (z != nullptr) {
-
-            if (z->child != nullptr) {
-                // make all child.p=nil
-                Node* x = z->child;
-                do {
-                    x->parent = nullptr;
-
-                    x = x->right;
-                } while (x != z->child);
-
-                // insert children to root list
-                list_merge(root, z->child);
-            }
-
-            list_remove(z);
-
-            if (z == z->right) {
-                root = nullptr;
-            } else {
-                root = z->right;
-                consolidate();
-            }
-
-            --n;
+        if (z == nullptr) {
+            throw LogicError("try to FibHeap::extract_min from empty heap");
         }
 
-        return z;
+        if (z->child != nullptr) {
+            // make all child.p=nil
+            Node* x = z->child;
+            do {
+                x->parent = nullptr;
+
+                x = x->right;
+            } while (x != z->child);
+
+            // insert children to root list
+            list_merge(root, z->child);
+        }
+
+        list_remove(z.get());
+
+        if (z.get() == z->right) {
+            root = nullptr;
+        } else {
+            root = z->right;
+            consolidate();
+        }
+
+        --n;
+        return z->data;
     }
 
     void decrease_key(Node* x, const Key& k) {
-        assert(comp(k, x->key));
+        assert(comp(k, x->data.first));
 
-        x->key = k;
+        x->data.first = k;
         Node* y = x->parent;
-        if (y != nullptr && comp(x->key, y->key)) {
+        if (y != nullptr && compare(x, y)) {
             cut(x, y);
             cascading_cut(y);
         }
 
-        if (comp(x->key, root->key))
+        if (compare(x, root))
             root = x;
     }
 
     void remove(Node* x) {
-        decrease_key(x, root->key - Key(1));
+        decrease_key(x, root->data.first - Key(1));
         extract_min();
     }
 
+    void clear_slow() {
+        while (!empty())
+            extract_min();
+    }
+
+    void clear() {
+        Node* x = root;
+        if (x != nullptr) {
+            do {
+                Node* next = x->right;
+                clear(x);
+                x = next;
+            } while (x != root);
+        }
+
+        root = nullptr;
+        assert(n==0);
+    }
+
 private:
+    bool compare(Node* x, Node* y) {
+        return comp(x->data.first, y->data.first);
+    }
+
     void consolidate() {
         std::vector<Node*> a(degree_max(), nullptr);
 
@@ -152,7 +189,7 @@ private:
 
             while (a[d] != nullptr) {
                 Node* y = a[d];
-                if (comp(y->key, x->key)) {
+                if (compare(y, x)) {
                     std::swap(x,y);
                 }
 
@@ -175,7 +212,7 @@ private:
                     x->parent = nullptr;
                     root = x;
 
-                } else if (comp(x->key, root->key)) {
+                } else if (compare(x, root)) {
                     root = x;
                 }
             }
@@ -228,6 +265,19 @@ private:
         return 2.08f*std::log(n);//2.08 ~ 1/log(golden_ratio)
     }
 
+    void clear(Node* node) {
+        Node* x = node->child;
+        if (x != nullptr) {
+            do {
+                Node* next = x->right;
+                clear(x);
+                x = next;
+            } while (x != node->child);
+        }
+
+        delete node;
+        --n;
+    }
     //====================================================================
     /// list ops
     void list_insert(Node* to, Node* x) {
@@ -263,20 +313,21 @@ private:
 
 public:
     int n = 0;
-    Node* root = nullptr;//min
+    Node* root = nullptr;
     Compare comp;
 };
 
 template<class Key, class T, class Compare>
-void print(const typename FibHeap<Key, T, Compare>::Node* node, int tab=1) {
-    std::cout << node->key;
+void print(const typename FibHeap<Key,T,Compare>::Node* node, int tab=1) {
+    std::cout << node->data.first << ":" << node->data.second;
+
     if (node->mark)
         std::cout << "*";
 
-    typename FibHeap<Key, T, Compare>::Node* x = node->child;
+    typename FibHeap<Key,T,Compare>::Node* x = node->child;
     if (x) {
         std::cout << "\t";
-        print<T>(x);
+        print<Key,T,Compare>(x);
 
         if (x != x->right) {
             do {
@@ -286,7 +337,7 @@ void print(const typename FibHeap<Key, T, Compare>::Node* node, int tab=1) {
                 }
 
                 x = x->right;
-                print<T>(x, tab+1);
+                print<Key,T,Compare>(x, tab+1);
             } while (x->right != node->child);
         }
     }
@@ -294,9 +345,9 @@ void print(const typename FibHeap<Key, T, Compare>::Node* node, int tab=1) {
 
 template<class Key, class T, class Compare>
 void print(const FibHeap<Key, T, Compare>& heap) {
-    typename FibHeap<Key, T, Compare>::Node* x = heap.root;
+    typename FibHeap<Key,T,Compare>::Node* x = heap.root;
     do {
-        print<T>(x);
+        print<Key,T,Compare>(x);
         std::cout << std::endl;
 
         x = x->right;

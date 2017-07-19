@@ -274,17 +274,13 @@ std::vector<vec3i> mst_prim_fib(const Graph& g, int r) {
     std::vector<Que::Node*> nodes(n, nullptr);
     for (int i = 0; i < n; ++i) {
         prnt_vert_dist[i].y = i;
-        Que::Node* node = new Que::Node(prnt_vert_dist[i].z, prnt_vert_dist[i].xy());
-        que.insert(node);
-        nodes[i] = node;
+        nodes[i] = que.insert(prnt_vert_dist[i].z, prnt_vert_dist[i].xy());
     }
 
     /// while Q != 0
     while (!que.empty()) {
         /// u = extract_min(Q)
-        Que::Node* node = que.extract_min();
-        vec2i u = node->value;
-        delete node;
+        vec2i u = que.extract_min().second;
         nodes[u.y] = nullptr;
 
         /// for v: g.adj(u)
@@ -399,17 +395,13 @@ void path_dijkstra_fib(std::vector<vec3i>& prnt_vert_dist, const Graph& g, int s
     std::vector<Que::Node*> nodes(n, nullptr);
     for (int i = 0; i < n; ++i) {
         prnt_vert_dist[i].y = i;
-        Que::Node* node = new Que::Node(prnt_vert_dist[i].z, prnt_vert_dist[i].xy());
-        que.insert(node);
-        nodes[i] = node;
+        nodes[i] = que.insert(prnt_vert_dist[i].z, prnt_vert_dist[i].xy());
     }
 
     /// while Q != 0
     while (!que.empty()) {
         /// u = extract_min(Q)
-        Que::Node* node = que.extract_min();
-        vec2i u = node->value;
-        delete node;
+        vec2i u = que.extract_min().second;
         nodes[u.y] = nullptr;
 
         /// for v: g.adj(u)
