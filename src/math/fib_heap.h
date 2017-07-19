@@ -8,50 +8,16 @@
 
 namespace bacchus {
 
-template<class T>
-void list_insert(T* to, T* x) {
-    if (to == nullptr) {
-        x->left = x;
-        x->right = x;
-
-    } else {
-        to->left->right = x;
-        x->left = to->left;
-        to->left = x;
-        x->right = to;
-    }
-}
-
-template<class T>
-void list_merge(T* to, T* x) {
-    if (to != nullptr && x != nullptr) {
-
-        T* left2 = x->left;
-
-        to->left->right = x;
-        x->left = to->left;
-
-        to->left = left2;
-        left2->right = to;
-    }
-}
-
-template<class T>
-void list_remove(T* x) {
-    x->left->right = x->right;
-    x->right->left = x->left;
-}
-
 //====================================================================
-template<class T>
+template<class Key, class T, class Compare = std::less<Key>>
 class FibHeap {
 public:
 
-    typedef std::function<bool(const T&, const T&)> Less;
-
     class Node {
     public:
-        Node(const T& t): key(t) {}
+        Node(const Key& k, const T& v = T())
+            : key(k), value(v)
+        {}
 
         Node* parent = nullptr;
         Node* child = nullptr;
@@ -61,10 +27,12 @@ public:
         int degree = 0;
         bool mark = false;
 
-        T key;
+        Key key;
+        T value;
     };
 
-    FibHeap(Less l = std::less<T>()): less(l) {}
+    FibHeap(const Compare& c = Compare()): comp(c) {}
+
     ~FibHeap() {}
 
     void insert(Node* x) {
@@ -77,7 +45,7 @@ public:
 
         if (root == nullptr) {
             root = x;
-        } else if (less(x->key, root->key)) {
+        } else if (comp(x->key, root->key)) {
             root = x;
         }
 
@@ -96,7 +64,7 @@ public:
         return n == 0;
     }
 
-    void merge(FibHeap<T>* h2) {
+    void merge(FibHeap* h2) {
         if (h2->root != nullptr) {
 
             if (root == nullptr) {
@@ -106,7 +74,7 @@ public:
 
                 list_merge(root, h2->root);
 
-                if (less(h2->root->key, root->key)) {
+                if (comp(h2->root->key, root->key)) {
                     root = h2->root;
                 }
             }
@@ -148,22 +116,22 @@ public:
         return z;
     }
 
-    void decrease_key(Node* x, const T& k) {
-        assert(less(k, x->key));
+    void decrease_key(Node* x, const Key& k) {
+        assert(comp(k, x->key));
 
         x->key = k;
         Node* y = x->parent;
-        if (y != nullptr && less(x->key, y->key)) {
+        if (y != nullptr && comp(x->key, y->key)) {
             cut(x, y);
             cascading_cut(y);
         }
 
-        if (less(x->key, root->key))
+        if (comp(x->key, root->key))
             root = x;
     }
 
     void remove(Node* x) {
-        decrease_key(x, root->key - T(1));
+        decrease_key(x, root->key - Key(1));
         extract_min();
     }
 
@@ -184,7 +152,7 @@ private:
 
             while (a[d] != nullptr) {
                 Node* y = a[d];
-                if (less(y->key, x->key)) {
+                if (comp(y->key, x->key)) {
                     std::swap(x,y);
                 }
 
@@ -207,7 +175,7 @@ private:
                     x->parent = nullptr;
                     root = x;
 
-                } else if (less(x->key, root->key)) {
+                } else if (comp(x->key, root->key)) {
                     root = x;
                 }
             }
@@ -260,19 +228,52 @@ private:
         return 2.08f*std::log(n);//2.08 ~ 1/log(golden_ratio)
     }
 
+    //====================================================================
+    /// list ops
+    void list_insert(Node* to, Node* x) {
+        if (to == nullptr) {
+            x->left = x;
+            x->right = x;
+
+        } else {
+            to->left->right = x;
+            x->left = to->left;
+            to->left = x;
+            x->right = to;
+        }
+    }
+
+    void list_merge(Node* to, Node* x) {
+        if (to != nullptr && x != nullptr) {
+
+            Node* left2 = x->left;
+
+            to->left->right = x;
+            x->left = to->left;
+
+            to->left = left2;
+            left2->right = to;
+        }
+    }
+
+    void list_remove(Node* x) {
+        x->left->right = x->right;
+        x->right->left = x->left;
+    }
+
 public:
     int n = 0;
     Node* root = nullptr;//min
-    Less less;
+    Compare comp;
 };
 
-template<class T>
-void print(const typename FibHeap<T>::Node* node, int tab=1) {
+template<class Key, class T, class Compare>
+void print(const typename FibHeap<Key, T, Compare>::Node* node, int tab=1) {
     std::cout << node->key;
     if (node->mark)
         std::cout << "*";
 
-    typename FibHeap<T>::Node* x = node->child;
+    typename FibHeap<Key, T, Compare>::Node* x = node->child;
     if (x) {
         std::cout << "\t";
         print<T>(x);
@@ -291,9 +292,9 @@ void print(const typename FibHeap<T>::Node* node, int tab=1) {
     }
 }
 
-template<class T>
-void print(const FibHeap<T>& heap) {
-    typename FibHeap<T>::Node* x = heap.root;
+template<class Key, class T, class Compare>
+void print(const FibHeap<Key, T, Compare>& heap) {
+    typename FibHeap<Key, T, Compare>::Node* x = heap.root;
     do {
         print<T>(x);
         std::cout << std::endl;

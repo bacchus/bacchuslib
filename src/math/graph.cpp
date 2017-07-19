@@ -269,21 +269,21 @@ std::vector<vec3i> mst_prim_fib(const Graph& g, int r) {
     prnt_vert_dist[r].z = 0;
 
     /// Q = g.vlist
-    typedef FibHeap<vec3i> Que;
-    Que que([](vec3i a, vec3i b){ return a.z < b.z; });
+    typedef FibHeap<int,vec2i> Que;
+    Que que;
     std::vector<Que::Node*> nodes(n, nullptr);
     for (int i = 0; i < n; ++i) {
         prnt_vert_dist[i].y = i;
-        Que::Node* node = new Que::Node(prnt_vert_dist[i]);
+        Que::Node* node = new Que::Node(prnt_vert_dist[i].z, prnt_vert_dist[i].xy());
         que.insert(node);
         nodes[i] = node;
     }
 
     /// while Q != 0
     while (!que.empty()) {
-        ///     u = extract_min(Q)
+        /// u = extract_min(Q)
         Que::Node* node = que.extract_min();
-        vec3i u = node->key;
+        vec2i u = node->value;
         delete node;
         nodes[u.y] = nullptr;
 
@@ -302,9 +302,7 @@ std::vector<vec3i> mst_prim_fib(const Graph& g, int r) {
                 prnt_vert_dist[v].z = w;
 
                 /// decrease_key(Q,v,W(u,v))
-                vec3i data = nodes[v]->key;
-                data.z = w;
-                que.decrease_key(nodes[v], data);
+                que.decrease_key(nodes[v], w);
             }
         }
     }
@@ -396,21 +394,21 @@ void path_dijkstra_fib(std::vector<vec3i>& prnt_vert_dist, const Graph& g, int s
     prnt_vert_dist[s].z = 0;
 
     /// Q = g.vlist
-    typedef FibHeap<vec3i> Que;
-    Que que([](vec3i a, vec3i b){ return a.z < b.z; });
+    typedef FibHeap<int,vec2i> Que;
+    Que que;
     std::vector<Que::Node*> nodes(n, nullptr);
     for (int i = 0; i < n; ++i) {
         prnt_vert_dist[i].y = i;
-        Que::Node* node = new Que::Node(prnt_vert_dist[i]);
+        Que::Node* node = new Que::Node(prnt_vert_dist[i].z, prnt_vert_dist[i].xy());
         que.insert(node);
         nodes[i] = node;
     }
 
     /// while Q != 0
     while (!que.empty()) {
-        ///     u = extract_min(Q)
+        /// u = extract_min(Q)
         Que::Node* node = que.extract_min();
-        vec3i u = node->key;
+        vec2i u = node->value;
         delete node;
         nodes[u.y] = nullptr;
 
@@ -421,9 +419,7 @@ void path_dijkstra_fib(std::vector<vec3i>& prnt_vert_dist, const Graph& g, int s
             int w = vw.second;   // W(u,v)
 
             if (relax(u.y,v,w, prnt_vert_dist)) {
-                vec3i data = nodes[v]->key;
-                data.z = prnt_vert_dist[v].z;
-                que.decrease_key(nodes[v], data);
+                que.decrease_key(nodes[v], prnt_vert_dist[v].z);
             }
         }
     }
