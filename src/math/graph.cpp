@@ -714,41 +714,49 @@ void ford_fulkerson(const Graph &g, int s, int t) {
 }
 
 //====================================================================
-// push flows
+/// used when u overfilled: c(u,v) > 0 && u.h = v.h + 1
+/// pushes u -> v: D(u,v) = min(u.e, c(u,v))
 bool push(const Graph &g, int u, int v
-          , Graph &d
-          , Graph &f
-          , std::vector<int>& h
-          , std::vector<int>& e
-          )
+          , Graph &d    // D(u,v) - flow amount that can be pushed u -> v
+          , Graph &f    // current preflow
+          , std::vector<int>& h     // v height
+          , std::vector<int>& e)    // extra flow
 {
-    if (g.get(u,v)-f.get(u,v) > 0 && h[u]==h[v]+1) {
-        d.set(u,v, std::min(e[u], g.get(u,v)-f.get(u,v)));
-        f.set(u,v, f.get(u,v) + d.get(u,v));
-        f.set(v,u, -f.get(u,v));
-        e[u] -= d.get(u,v);
-        e[v] += d.get(u,v);
+    int c = g.get(u,v) - f.get(u,v);
+    if (c > 0 && h[u] == h[v] + 1) {
+        int df = std::min(e[u], c);
+        d.set(u,v, df);
+        f.set(u,v, f.get(u,v) + df);// f(u,v) + df
+        f.set(v,u, -f.get(u,v));    //BCC: check f(u,v) - df
+        e[u] -= df;
+        e[v] += df;
         return true;
     }
     return false;
 }
 
+/// used when u overfilled && for v in V: (u,v) in Ef, u.h<=v.h
+/// increases u.h
 bool relabel(const Graph &g, int u, std::vector<int>& h) {
     int minhv = inf;
+
     for (auto v: g.adj(u)) {
-        if (h[u] > h[v.first]) return false;
-        if (h[v.first] < minhv) minhv = h[v.first];
+        if (h[u] > h[v.first])
+            return false;
+
+        if (h[v.first] < minhv)
+            minhv = h[v.first];
     }
 
     h[u] = 1 + minhv;
     return true;
 }
 
+/// setup initial preflow by c(u,v) if u==s, else 0
 void init_preflow(const Graph &g, int s
-                  , Graph &f
-                  , std::vector<int>& h
-                  , std::vector<int>& e
-                  )
+                  , Graph &f    // current preflow
+                  , std::vector<int>& h     // v height
+                  , std::vector<int>& e)    // extra flow
 {
     for (auto u: g.vlist()) {
         for (auto v: g.adj(u)) {
@@ -756,13 +764,16 @@ void init_preflow(const Graph &g, int s
             f.set(v.first,u,0);
         }
     }
+
     h[s] = g.vsize();
-    for (auto u: g.adj(s)) {
-        int csu = u.second;
-        f.set(s,u.first, csu);
-        f.set(u.first,s,-csu);
-        e[u.first] = csu;
-        e[s] -= csu;
+
+    for (auto vw: g.adj(s)) {
+        int v = vw.first;
+        int c = vw.second;
+        f.set(s,v, c);
+        f.set(v,s,-c);
+        e[v] = c;
+        e[s] -= c;
     }
 }
 
@@ -770,9 +781,9 @@ void generic_push_relabel(const Graph &g, int s, int t) {
     int n = g.vsize();
     std::vector<int> h(n,0);
     std::vector<int> e(n,0);
-    Graph d;
-    Graph f;
-    init_preflow(g,s,f,h,e);
+    Graph d(g.vlist());
+    Graph f(g.vlist());
+    init_preflow(g,s, f, h,e);
 
     bool exist = true;
     while (exist) {
@@ -784,7 +795,7 @@ void generic_push_relabel(const Graph &g, int s, int t) {
                     exist = exist || push(g,u,v.first,d,f,h,e);
                 }
             }
-            if (exist) break;
+            if (exist) break; //BCC: is it here, mb after for-loop
         }
     }
 

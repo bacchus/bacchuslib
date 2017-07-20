@@ -21,37 +21,39 @@ namespace bacchus {
 /// Ei: std::map<u, weight>
 /// E:  std::map<v, Ei>
 class Graph {
-private:
-    std::map<int, std::map<int,int> > m_data;// v -> u,w
-    std::set<int> m_vlist;// v-s
-
 public:
+    typedef std::set<int>               vlist_type;
+    typedef std::map<int,int>           adj_type;
+    typedef std::map<int, adj_type>     elist_type;
+
     Graph() = default;
     Graph(const Graph&) = default;
     Graph& operator=(const Graph&) = default;
     Graph(Graph&&) = default;
     Graph& operator=(Graph&&) = default;
 
+    Graph(const vlist_type& v): m_vlist(v) {}
+
     uint vsize() const {
         return m_vlist.size();
     }
 
-    const std::map<int,int>& adj(int v) const {
+    const adj_type& adj(int v) const {
         assert(m_data.count(v));
         return m_data.at(v);
     }
 
-    const std::set<int>& vlist() const {
+    const vlist_type& vlist() const {
         return m_vlist;
     }
 
-    void insertw(int v, const std::map<int,int>& adj_list) {
+    void insertw(int v, const adj_type& adj_list) {
         assert(m_data.count(v)==0);
         m_vlist.insert(v);
         m_data[v] = adj_list;
     }
 
-    void insert(int v, const std::set<int>& adj_list) {
+    void insert(int v, const vlist_type& adj_list) {
         assert(m_data.count(v)==0);
         m_vlist.insert(v);
         for (auto u: adj_list) m_data[v][u] = 1;
@@ -89,6 +91,10 @@ public:
         m_vlist.erase(v);
         m_data.erase(v);
     }
+
+private:
+    elist_type m_data;// v -> u,w
+    vlist_type m_vlist;// v-s
 };
 
 inline std::ostream& operator <<(std::ostream& ostr, const Graph& mat) {

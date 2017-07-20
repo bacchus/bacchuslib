@@ -224,7 +224,7 @@ TEST(graph_test, Johnson) {
 TEST(graph_test, FordFlukerson) {
     Graph g;
     g.insertw(0, {{1,16},{2,13}});
-    g.insertw(1, {{2,10},{3,12}});
+    g.insertw(1, {{3,12}});
     g.insertw(2, {{1,4},{4,14}});
     g.insertw(3, {{2,9},{5,20}});
     g.insertw(4, {{3,7},{5,4}});
@@ -242,5 +242,17 @@ TEST(graph_test, FordFlukersonDegenerate) {
 
     ford_fulkerson(g, 0, 3);
 }
+
+//TEST(graph_test, PushRelabel) {
+//    Graph g;
+//    g.insertw(0, {{1,16},{2,13}});
+//    g.insertw(1, {{3,12}});
+//    g.insertw(2, {{1,4},{4,14}});
+//    g.insertw(3, {{2,9},{5,20}});
+//    g.insertw(4, {{3,7},{5,4}});
+//    g.insertw(5, {});
+
+//    generic_push_relabel(g, 0, 5);
+//}
 
 #endif
