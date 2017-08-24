@@ -23,14 +23,17 @@ inline bool test_sort(const std::vector<T>& a) {
 template<typename T>
 inline void insert_sort(std::vector<T>& a) {
     for (int j = 1; j < (int)a.size(); ++j) {
-        const T key = a[j];
-        int i = j - 1;
-        // bin-search-insert can be used here
-        while (i >= 0 && a[i] > key) {
+//        const T& key = a[j];
+//        int i = j - 1;
+//        while (i >= 0 && a[i] > key) {
+//            a[i+1] = a[i];
+//            --i;
+//        }
+        int i;
+        for (int i = j - 1; i >= 0 && a[i] > a[j]; --i) {
             a[i+1] = a[i];
-            --i;
         }
-        a[i+1] = key;
+        a[i+1] = a[j];
     }
 }
 
