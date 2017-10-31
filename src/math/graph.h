@@ -121,6 +121,10 @@ void dfs(const Graph& g);// O(V + E)
 void find_undirected_connected_components(const Graph& g); // use BFS
 std::deque<int> topological_sort(const Graph& g); // use DFS
 
+/// articulation_points, bridges
+void articulation_points(const Graph& g);
+void bridge_edges(const Graph& g);
+
 /// oriented graph
 Graph transpose(const Graph& g);
 void strongly_connectes_components(const Graph& g);

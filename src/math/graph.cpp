@@ -193,6 +193,120 @@ std::deque<int> topological_sort(const Graph& g) {
 }
 
 //====================================================================
+void articulate_dfs_visit(const Graph& g, int u
+               , std::vector<int>& colr
+               , std::vector<int>& prnt
+               , std::vector<int>& dist
+               , std::vector<int>& low
+               , std::vector<int>& ap
+               )
+{
+    colr[u] = GRAY;
+
+    static int t = 0;
+    dist[u] = ++t;
+
+    low[u] = dist[u];
+    int num_children = 0;
+
+    for (auto vw: g.adj(u)) {
+        int v = vw.first;
+
+        if (colr[v]==WHIT) {
+            ++num_children;
+            prnt[v] = u;
+            articulate_dfs_visit(g,v, colr, prnt, dist, low, ap);
+
+            // update if subtree v has connection to ancestors of u
+            low[u] = std::min(low[u], low[v]);
+            // 1. u is root, and has children >= 2
+            if (prnt[u] == nil && num_children > 1)
+                ap[u] = 1;
+            // u not root, low for one of its children > dist[u]
+            if (prnt[u] != nil && low[v] >= dist[u])
+                ap[u] = 1;
+
+        } else if (prnt[u] != v) {
+            // update low[u] for parent calls
+            low[u] = std::min(low[u], dist[v]);
+        }
+
+    }
+}
+
+void articulation_points(const Graph& g) {
+    std::vector<int> colr(g.vsize(), WHIT);
+    std::vector<int> prnt(g.vsize(), nil);
+    std::vector<int> dist(g.vsize(), 0);
+    std::vector<int> low(g.vsize(), 0);
+    std::vector<int> ap(g.vsize(), 0);
+
+    for (auto u: g.vlist()) {
+        if (colr[u]==WHIT) {
+            articulate_dfs_visit(g,u, colr, prnt, dist, low, ap);
+        }
+    }
+
+    for (uint i=0; i<ap.size(); ++i) {
+        if (ap[i])
+            std::cout << i << " ";
+    }
+    std::cout << std::endl;
+}
+
+//====================================================================
+void bridge_dfs_visit(const Graph& g, int u
+               , std::vector<int>& colr
+               , std::vector<int>& prnt
+               , std::vector<int>& dist
+               , std::vector<int>& low
+               )
+{
+    colr[u] = GRAY;
+
+    static int t = 0;
+    dist[u] = ++t;
+
+    low[u] = dist[u];
+    //int num_children = 0;
+
+    for (auto vw: g.adj(u)) {
+        int v = vw.first;
+
+        if (colr[v]==WHIT) {
+            //++num_children;
+            prnt[v] = u;
+            bridge_dfs_visit(g,v, colr, prnt, dist, low);
+
+            // update if subtree v has connection to ancestors of u
+            low[u] = std::min(low[u], low[v]);
+
+            // if lowest reachable below u
+            if (low[v] > dist[u])
+                std::cout << u << "-" << v << " ";
+
+        } else if (prnt[u] != v) {
+            // update low[u] for parent calls
+            low[u] = std::min(low[u], dist[v]);
+        }
+    }
+}
+
+void bridge_edges(const Graph& g) {
+    std::vector<int> colr(g.vsize(), WHIT);
+    std::vector<int> prnt(g.vsize(), nil);
+    std::vector<int> dist(g.vsize(), 0);
+    std::vector<int> low(g.vsize(), 0);
+
+    for (auto u: g.vlist()) {
+        if (colr[u]==WHIT) {
+            bridge_dfs_visit(g,u, colr, prnt, dist, low);
+        }
+    }
+
+    std::cout << std::endl;
+}
+//====================================================================
 Graph transpose(const Graph& g) {
     Graph tr;
     for (auto u: g.vlist()) {

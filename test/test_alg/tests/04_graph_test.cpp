@@ -255,4 +255,77 @@ TEST(graph_test, FordFlukersonDegenerate) {
 //    generic_push_relabel(g, 0, 5);
 //}
 
+//====================================================================
+TEST(graph_test, Articulate) {
+    {
+        Graph g;
+        g.insert(0, {1,2,3});
+        g.insert(1, {0,2});
+        g.insert(2, {0,1});
+        g.insert(3, {0,4});
+        g.insert(4, {3});
+
+        articulation_points(g); // 0 3
+    }
+
+    {
+        Graph g;
+        g.insert(0, {1});
+        g.insert(1, {0,2});
+        g.insert(2, {1,3});
+        g.insert(3, {2});
+
+        articulation_points(g); // 1 2
+    }
+
+    {
+        Graph g;
+        g.insert(0, {1,2});
+        g.insert(1, {0,2,3,4,6});
+        g.insert(2, {0,1});
+        g.insert(3, {1,5});
+        g.insert(4, {1,5});
+        g.insert(5, {3,4});
+        g.insert(6, {1});
+
+        articulation_points(g); // 1
+    }
+}
+//====================================================================
+TEST(graph_test, Bridges) {
+    {
+        Graph g;
+        g.insert(0, {1,2,3});
+        g.insert(1, {0,2});
+        g.insert(2, {0,1});
+        g.insert(3, {0,4});
+        g.insert(4, {3});
+
+        bridge_edges(g); // 3-4 0-3
+    }
+
+    {
+        Graph g;
+        g.insert(0, {1});
+        g.insert(1, {0,2});
+        g.insert(2, {1,3});
+        g.insert(3, {2});
+
+        bridge_edges(g); // 2-3 1-2 0-1
+    }
+
+    {
+        Graph g;
+        g.insert(0, {1,2});
+        g.insert(1, {0,2,3,4,6});
+        g.insert(2, {0,1});
+        g.insert(3, {1,5});
+        g.insert(4, {1,5});
+        g.insert(5, {3,4});
+        g.insert(6, {1});
+
+        bridge_edges(g); // 1-6
+    }
+}
+
 #endif
