@@ -22,7 +22,7 @@ namespace bacchus {
 /// E:  std::map<v, Ei>
 class Graph {
 public:
-    typedef std::set<int>               vlist_type;
+    typedef std::vector<int>            vlist_type;
     typedef std::map<int,int>           adj_type;
     typedef std::map<int, adj_type>     elist_type;
 
@@ -32,10 +32,10 @@ public:
     Graph(Graph&&) = default;
     Graph& operator=(Graph&&) = default;
 
-    Graph(const vlist_type& v): m_vlist(v) {}
+    Graph(uint num): n(num) {}
 
-    uint vsize() const {
-        return m_vlist.size();
+    uint size() const {
+        return n;
     }
 
     const adj_type& adj(int v) const {
@@ -43,20 +43,17 @@ public:
         return m_data.at(v);
     }
 
-    const vlist_type& vlist() const {
-        return m_vlist;
-    }
-
     void insertw(int v, const adj_type& adj_list) {
         assert(m_data.count(v)==0);
-        m_vlist.insert(v);
+        n = std::max(n,v+1);
         m_data[v] = adj_list;
     }
 
     void insert(int v, const vlist_type& adj_list) {
         assert(m_data.count(v)==0);
-        m_vlist.insert(v);
-        for (auto u: adj_list) m_data[v][u] = 1;
+        n = std::max(n,v+1);
+        for (auto u: adj_list)
+            m_data[v][u] = 1;
     }
 
     /// adds v to V and w(v,u)
@@ -67,7 +64,7 @@ public:
 
     /// adds v to V
     void addv(int v) {
-        m_vlist.insert(v);
+        n = std::max(n,v+1);
     }
 
     /// adds w(v,u)
@@ -87,20 +84,15 @@ public:
         return m_data.at(v).at(u);
     }
 
-    void erase(int v) {
-        m_vlist.erase(v);
-        m_data.erase(v);
-    }
-
 private:
+    int n = 0;
     elist_type m_data;// v -> u,w
-    vlist_type m_vlist;// v-s
 };
 
-inline std::ostream& operator <<(std::ostream& ostr, const Graph& mat) {
-    for (auto v: mat.vlist()) {
+inline std::ostream& operator <<(std::ostream& ostr, const Graph& g) {
+    for (uint v=0; v<g.size(); ++v) {
         ostr << v << ": ";
-        for (auto u: mat.adj(v)) {
+        for (auto u: g.adj(v)) {
             ostr << u.first << "(" << u.second << ") ";
         }
         ostr<<std::endl;

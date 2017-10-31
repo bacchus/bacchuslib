@@ -17,9 +17,9 @@ TEST(graph_test, BFS_DFS) {
     g.insert(6, {4,5,7});
     g.insert(7, {5,6});
 
-    std::vector<int> dist(g.vsize(), BCC_M_INT_MAX);
-    std::vector<int> prnt(g.vsize(), nil);
-    std::vector<int> colr(g.vsize(), 0);//white
+    std::vector<int> dist(g.size(), BCC_M_INT_MAX);
+    std::vector<int> prnt(g.size(), nil);
+    std::vector<int> colr(g.size(), 0);//white
     bfs(g, 2, dist, prnt, colr);
 
     PRINT(dist);
