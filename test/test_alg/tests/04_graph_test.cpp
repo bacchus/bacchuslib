@@ -98,7 +98,7 @@ TEST(graph_test, MST) {
         int sum = 0;
         std::vector<vec3i> fib = mst_prim_fib(g,0);
         for (int i = 1; i < (int)fib.size(); ++i) {
-            sum += g.get(fib[i].x, i);
+            sum += g.weight(fib[i].x, i);
         }
         std::cout << "sum: " << sum;
         PRINT(fib);

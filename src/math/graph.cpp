@@ -48,7 +48,7 @@ int dist_path(const Graph& g, const std::vector<vec3i> &prnt_vert_dist, int s, i
     } else if (prnt_vert_dist[v].x == nil) {
         return inf;
     } else {
-        return g.get(prnt_vert_dist[v].x, v) + dist_path(g, prnt_vert_dist, s, prnt_vert_dist[v].x);
+        return g.weight(prnt_vert_dist[v].x, v) + dist_path(g, prnt_vert_dist, s, prnt_vert_dist[v].x);
     }
 }
 //====================================================================
@@ -563,7 +563,7 @@ void path_dijkstra(const Graph &g, int s) {
 
     while (!vlist.empty()) {
         vec3i vuw = edges.front();
-        dist[vuw.y] = dist[vuw.x] + g.get(vuw.x, vuw.y);
+        dist[vuw.y] = dist[vuw.x] + g.weight(vuw.x, vuw.y);
         prnt[vuw.y] = vuw.x;
         edges.remove(vuw);
         for (auto u: g.adj(vuw.y)) {
@@ -605,7 +605,7 @@ void path_dijkstra_mm(const Graph &g, int s) {
             continue;
         }
         vlist.erase(u);
-        dist[u] = dist[v] + g.get(v, u);
+        dist[u] = dist[v] + g.weight(v, u);
         prnt[u] = v;
         for (auto nu: g.adj(u)) {
             edges.emplace(nu.second, vec2i(u, nu.first));
@@ -788,8 +788,8 @@ void ford_fulkerson(const Graph& g, int s, int t) {
             int u = que.front();
             que.pop_front();
             for (auto v: g.adj(u)) {
-                int fuv = f.get(u,v.first);
-                int guv = g.get(u,v.first);
+                int fuv = f.weight(u,v.first);
+                int guv = g.weight(u,v.first);
                 if ((colr[v.first] == WHIT) && (fuv < guv)) {
                     if (v.first==t) {
                         found = true;
@@ -810,7 +810,7 @@ void ford_fulkerson(const Graph& g, int s, int t) {
                 int v = t;
                 while (v != s) {
                     int u = prnt[v];
-                    int cfp = g.get(u,v)-f.get(u,v);
+                    int cfp = g.weight(u,v)-f.weight(u,v);
                     if (cfp < minc) minc = cfp;
                     v = prnt[v];
                 }
@@ -821,8 +821,8 @@ void ford_fulkerson(const Graph& g, int s, int t) {
                     int u = prnt[v];
                     //f.set(u,v, fuv + minc);//fix1
                     //f.set(v,u, -f.get(u,v));
-                    int& fuv = f.get(u,v);
-                    int& fvu = f.get(v,u);
+                    int& fuv = f.weight_mut(u,v);
+                    int& fvu = f.weight_mut(v,u);
 
                     fuv += minc;
                     fvu = -fuv;

@@ -17,15 +17,12 @@ namespace bacchus {
 
 //====================================================================
 /// adjacency-list representation
-/// V:  std::set
-/// Ei: std::map<u, weight>
-/// E:  std::map<v, Ei>
 class Graph {
 public:
     using vlist_type = std::vector<int>;        // for list of verts
     using edge_type = std::pair<int,int>;       // vertex, weight
     using adj_type = std::vector<edge_type>;    // list of edges
-    using data_type = std::vector<adj_type>;   // array of adjs
+    using data_type = std::vector<adj_type>;    // vec of vec of pair
 
     Graph(const Graph&) = default;
     Graph& operator=(const Graph&) = default;
@@ -33,27 +30,27 @@ public:
     Graph& operator=(Graph&&) = default;
 
     Graph(uint num): data(num) {}
+
     uint size() const { return data.size(); }
+    void resize(int n) { data.resize(n); }
 
     const adj_type& adj(int v) const { return data[v]; }
     adj_type& adj_mut(int v) { return data[v]; }
 
-    void insertw(int v, const adj_type& adj_list) { data[v] = adj_list; }
+    void add(int v, int u, int w=1) {
+        data[v].emplace_back(u,w);
+    }
+
+    void insertw(int v, const adj_type& adj_list) {
+        data[v] = adj_list;
+    }
+
     void insert(int v, const vlist_type& adj_list) {
         for (auto u: adj_list)
             data[v].emplace_back(u,1);
     }
 
-    /// adds w(v,u)
-    void add(int v, int u, int w=1) {
-        data[v].emplace_back(u,w);
-    }
-
-    void resize(int n) {
-        data.resize(n);
-    }
-
-    int get(int v, int u) const {
+    int weight(int v, int u) const {
         for (const edge_type& edge: data[v]) {
             if (edge.first == u)
                 return edge.second;
@@ -62,7 +59,7 @@ public:
         return 0;
     }
 
-    int& get(int v, int u) {
+    int& weight_mut(int v, int u) {
         for (edge_type& edge: data[v]) {
             if (edge.first == u)
                 return edge.second;
@@ -72,8 +69,7 @@ public:
     }
 
 private:
-    int n = 0;
-    data_type data;// v -> u,w
+    data_type data;
 };
 
 inline std::ostream& operator <<(std::ostream& ostr, const Graph& g) {
