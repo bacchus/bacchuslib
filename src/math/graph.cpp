@@ -308,7 +308,7 @@ void bridge_edges(const Graph& g) {
 }
 //====================================================================
 Graph transpose(const Graph& g) {
-    Graph tr;
+    Graph tr(g.size());
     for (uint u=0; u<g.size(); ++u) {
         for (auto v: g.adj(u)) {
             tr.add(v.first,u);
@@ -726,9 +726,9 @@ bool johnson(GraphM& res, const Graph& g) {
     /// G2.V = G.V U {s}
     /// G2.E = G.E U {(s,v): v in G.V, w(s,v)=0}
     Graph g2(g);
-    g2.addv(s);
+    g2.resize(n+1);//fix1:
     for (uint v=0; v<g.size(); ++v) {
-        g2.adde(s,v,0);
+        g2.add(s,v,0);
     }
 
     /// bellman_ford
@@ -744,8 +744,9 @@ bool johnson(GraphM& res, const Graph& g) {
 
         /// w2(u,v) = w(u,v) + h(u) - h(v)
         for (uint u=0; u<g2.size(); ++u) {
-            for (auto v: g2.adj(u)) {
-                g2.set(u,v.first, v.second + h[u] - h[v.first]);
+            for (auto& v: g2.adj_mut(u)) {
+                //g2.set(u,v.first, v.second + h[u] - h[v.first]);//fix1
+                v.second += h[u] - h[v.first];
             }
         }
 
@@ -767,8 +768,8 @@ bool johnson(GraphM& res, const Graph& g) {
 }
 
 //====================================================================
-void ford_fulkerson(const Graph &g, int s, int t) {
-    Graph f;
+void ford_fulkerson(const Graph& g, int s, int t) {
+    Graph f(g.size());
     for (uint v=0; v<g.size(); ++v) {
         for (auto u: g.adj(v)) {
             f.add(v,u.first,0);
@@ -818,9 +819,14 @@ void ford_fulkerson(const Graph &g, int s, int t) {
                 int v = t;
                 while (v != s) {
                     int u = prnt[v];
-                    int fuv = f.get(u,v);
-                    f.set(u,v, fuv + minc);
-                    f.set(v,u, -f.get(u,v));
+                    //f.set(u,v, fuv + minc);//fix1
+                    //f.set(v,u, -f.get(u,v));
+                    int& fuv = f.get(u,v);
+                    int& fvu = f.get(v,u);
+
+                    fuv += minc;
+                    fvu = -fuv;
+
                     v = prnt[v];
                 }
             }
@@ -837,91 +843,91 @@ void ford_fulkerson(const Graph &g, int s, int t) {
 //====================================================================
 /// used when u overfilled: c(u,v) > 0 && u.h = v.h + 1
 /// pushes u -> v: D(u,v) = min(u.e, c(u,v))
-bool push(const Graph &g, int u, int v
-          , Graph &d    // D(u,v) - flow amount that can be pushed u -> v
-          , Graph &f    // current preflow
-          , std::vector<int>& h     // v height
-          , std::vector<int>& e)    // extra flow
-{
-    int c = g.get(u,v) - f.get(u,v);
-    if (c > 0 && h[u] == h[v] + 1) {
-        int df = std::min(e[u], c);
-        d.set(u,v, df);
-        f.set(u,v, f.get(u,v) + df);// f(u,v) + df
-        f.set(v,u, -f.get(u,v));    //BCC: check f(u,v) - df
-        e[u] -= df;
-        e[v] += df;
-        return true;
-    }
-    return false;
-}
+//bool push(const Graph &g, int u, int v
+//          , Graph &d    // D(u,v) - flow amount that can be pushed u -> v
+//          , Graph &f    // current preflow
+//          , std::vector<int>& h     // v height
+//          , std::vector<int>& e)    // extra flow
+//{
+//    int c = g.get(u,v) - f.get(u,v);
+//    if (c > 0 && h[u] == h[v] + 1) {
+//        int df = std::min(e[u], c);
+//        d.set(u,v, df);
+//        f.set(u,v, f.get(u,v) + df);// f(u,v) + df
+//        f.set(v,u, -f.get(u,v));    //BCC: check f(u,v) - df
+//        e[u] -= df;
+//        e[v] += df;
+//        return true;
+//    }
+//    return false;
+//}
 
 /// used when u overfilled && for v in V: (u,v) in Ef, u.h<=v.h
 /// increases u.h
-bool relabel(const Graph &g, int u, std::vector<int>& h) {
-    int minhv = inf;
+//bool relabel(const Graph &g, int u, std::vector<int>& h) {
+//    int minhv = inf;
 
-    for (auto v: g.adj(u)) {
-        if (h[u] > h[v.first])
-            return false;
+//    for (auto v: g.adj(u)) {
+//        if (h[u] > h[v.first])
+//            return false;
 
-        if (h[v.first] < minhv)
-            minhv = h[v.first];
-    }
+//        if (h[v.first] < minhv)
+//            minhv = h[v.first];
+//    }
 
-    h[u] = 1 + minhv;
-    return true;
-}
+//    h[u] = 1 + minhv;
+//    return true;
+//}
 
 /// setup initial preflow by c(u,v) if u==s, else 0
-void init_preflow(const Graph &g, int s
-                  , Graph &f    // current preflow
-                  , std::vector<int>& h     // v height
-                  , std::vector<int>& e)    // extra flow
-{
-    for (uint u=0; u<g.size(); ++u) {
-        for (auto v: g.adj(u)) {
-            f.set(u,v.first,0);
-            f.set(v.first,u,0);
-        }
-    }
+//void init_preflow(const Graph &g, int s
+//                  , Graph &f    // current preflow
+//                  , std::vector<int>& h     // v height
+//                  , std::vector<int>& e)    // extra flow
+//{
+//    for (uint u=0; u<g.size(); ++u) {
+//        for (auto v: g.adj(u)) {
+//            f.set(u,v.first,0);
+//            f.set(v.first,u,0);
+//        }
+//    }
 
-    h[s] = g.size();
+//    h[s] = g.size();
 
-    for (auto vw: g.adj(s)) {
-        int v = vw.first;
-        int c = vw.second;
-        f.set(s,v, c);
-        f.set(v,s,-c);
-        e[v] = c;
-        e[s] -= c;
-    }
-}
+//    for (auto vw: g.adj(s)) {
+//        int v = vw.first;
+//        int c = vw.second;
+//        f.set(s,v, c);
+//        f.set(v,s,-c);
+//        e[v] = c;
+//        e[s] -= c;
+//    }
+//}
 
-void generic_push_relabel(const Graph &g, int s, int t) {
-    int n = g.size();
-    std::vector<int> h(n,0);
-    std::vector<int> e(n,0);
-    Graph d(g.size());
-    Graph f(g.size());
-    init_preflow(g,s, f, h,e);
+//void generic_push_relabel(const Graph &g, int s, int t) {
+//    int n = g.size();
+//    std::vector<int> h(n,0);
+//    std::vector<int> e(n,0);
+//    Graph d(g.size());
+//    Graph f(g.size());
+//    init_preflow(g,s, f, h,e);
 
-    bool exist = true;
-    while (exist) {
-        exist = false;
-        for (uint u=0; u<g.size(); ++u) {
-            if (u != s && u!= t && e[u] > 0) {
-                exist = relabel(g,u,h);
-                for (auto v: g.adj(u)) {
-                    exist = exist || push(g,u,v.first,d,f,h,e);
-                }
-            }
-            if (exist) break; //BCC: is it here, mb after for-loop
-        }
-    }
+//    bool exist = true;
+//    while (exist) {
+//        exist = false;
+//        for (uint u=0; u<g.size(); ++u) {
+//            if (u != s && u!= t && e[u] > 0) {
+//                exist = relabel(g,u,h);
+//                for (auto v: g.adj(u)) {
+//                    exist = exist || push(g,u,v.first,d,f,h,e);
+//                }
+//            }
+//            if (exist) break; //BCC: is it here, mb after for-loop
+//        }
+//    }
 
-    std::cout << d << std::endl;
-    std::cout << f << std::endl;
-}
+//    std::cout << d << std::endl;
+//    std::cout << f << std::endl;
+//}
 
 } // namespace bacchus

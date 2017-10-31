@@ -22,71 +22,58 @@ namespace bacchus {
 /// E:  std::map<v, Ei>
 class Graph {
 public:
-    typedef std::vector<int>            vlist_type;
-    typedef std::map<int,int>           adj_type;
-    typedef std::map<int, adj_type>     elist_type;
+    using vlist_type = std::vector<int>;        // for list of verts
+    using edge_type = std::pair<int,int>;       // vertex, weight
+    using adj_type = std::vector<edge_type>;    // list of edges
+    using data_type = std::vector<adj_type>;   // array of adjs
 
-    Graph() = default;
     Graph(const Graph&) = default;
     Graph& operator=(const Graph&) = default;
     Graph(Graph&&) = default;
     Graph& operator=(Graph&&) = default;
 
-    Graph(uint num): n(num) {}
+    Graph(uint num): data(num) {}
+    uint size() const { return data.size(); }
 
-    uint size() const {
-        return n;
-    }
+    const adj_type& adj(int v) const { return data[v]; }
+    adj_type& adj_mut(int v) { return data[v]; }
 
-    const adj_type& adj(int v) const {
-        assert(m_data.count(v));
-        return m_data.at(v);
-    }
-
-    void insertw(int v, const adj_type& adj_list) {
-        assert(m_data.count(v)==0);
-        n = std::max(n,v+1);
-        m_data[v] = adj_list;
-    }
-
+    void insertw(int v, const adj_type& adj_list) { data[v] = adj_list; }
     void insert(int v, const vlist_type& adj_list) {
-        assert(m_data.count(v)==0);
-        n = std::max(n,v+1);
         for (auto u: adj_list)
-            m_data[v][u] = 1;
-    }
-
-    /// adds v to V and w(v,u)
-    void add(int v, int u, int w=1) {
-        addv(v);
-        adde(v,u,w);
-    }
-
-    /// adds v to V
-    void addv(int v) {
-        n = std::max(n,v+1);
+            data[v].emplace_back(u,1);
     }
 
     /// adds w(v,u)
-    void adde(int v, int u, int w=1) {
-        m_data[v][u] = w;
+    void add(int v, int u, int w=1) {
+        data[v].emplace_back(u,w);
     }
 
-    void set(int v, int u, int w=1) {
-        assert(m_data.count(v)!=0);
-        assert(m_data[v].count(u)!=0);
-        m_data[v][u] = w;
+    void resize(int n) {
+        data.resize(n);
     }
 
     int get(int v, int u) const {
-        assert(m_data.count(v)!=0);
-        assert(m_data.at(v).count(u)!=0);
-        return m_data.at(v).at(u);
+        for (const edge_type& edge: data[v]) {
+            if (edge.first == u)
+                return edge.second;
+        }
+        assert(false); // must never get here
+        return 0;
+    }
+
+    int& get(int v, int u) {
+        for (edge_type& edge: data[v]) {
+            if (edge.first == u)
+                return edge.second;
+        }
+        assert(false); // must never get here
+        return data[0][0].second;
     }
 
 private:
     int n = 0;
-    elist_type m_data;// v -> u,w
+    data_type data;// v -> u,w
 };
 
 inline std::ostream& operator <<(std::ostream& ostr, const Graph& g) {

@@ -7,7 +7,7 @@
 using namespace bacchus;
 
 TEST(graph_test, BFS_DFS) {
-    Graph g;
+    Graph g(8);
     g.insert(0, {1});
     g.insert(1, {0,2});
     g.insert(2, {1,3});
@@ -50,7 +50,7 @@ TEST(graph_test, BFS_DFS) {
 //}
 
 TEST(graph_test, SCC) {
-    Graph g;
+    Graph g(8);
     g.insert(0, {1});
     g.insert(1, {4,5,2});
     g.insert(2, {3,6});
@@ -65,7 +65,7 @@ TEST(graph_test, SCC) {
 
 //====================================================================
 TEST(graph_test, MST) {
-    Graph g;
+    Graph g(9);
     g.insertw(0, {{1,4},{7,8}});
     g.insertw(1, {{2,8},{7,11},{0,4}});
     g.insertw(2, {{3,7},{5,4},{8,2},{1,8}});
@@ -108,7 +108,7 @@ TEST(graph_test, MST) {
 
 //====================================================================
 TEST(graph_test, BellmanFord) {
-    Graph g;
+    Graph g(5);
     g.insertw(0, {{1,6},{4,7}});
     g.insertw(1, {{2,5},{3,-4},{4,8}});
     g.insertw(2, {{1,-2}});
@@ -129,7 +129,7 @@ TEST(graph_test, BellmanFord) {
 }
 
 TEST(graph_test, Dag) {
-    Graph g;
+    Graph g(6);
     g.insertw(0, {{1,5},{2,3}});
     g.insertw(1, {{2,2},{3,6}});
     g.insertw(2, {{3,7},{4,4},{5,2}});
@@ -162,7 +162,7 @@ TEST(graph_test, Dag) {
 //}
 
 TEST(graph_test, Dijkstra) {
-    Graph g;
+    Graph g(5);
     g.insertw(0, {{1,10},{4,5}});
     g.insertw(1, {{2,1},{4,2}});
     g.insertw(2, {{3,4}});
@@ -206,7 +206,7 @@ TEST(graph_test, AllShortestPath) {
 }
 
 TEST(graph_test, Johnson) {
-    Graph g;
+    Graph g(5);
     g.insertw(0, {{1,3},{2,8},{4,-4}});
     g.insertw(1, {{3,1},{4,7}});
     g.insertw(2, {{1,4}});
@@ -222,7 +222,7 @@ TEST(graph_test, Johnson) {
 
 //====================================================================
 TEST(graph_test, FordFlukerson) {
-    Graph g;
+    Graph g(6);
     g.insertw(0, {{1,16},{2,13}});
     g.insertw(1, {{3,12}});
     g.insertw(2, {{1,4},{4,14}});
@@ -234,7 +234,7 @@ TEST(graph_test, FordFlukerson) {
 }
 
 TEST(graph_test, FordFlukersonDegenerate) {
-    Graph g;
+    Graph g(4);
     g.insertw(0, {{1,1000},{2,1000}});
     g.insertw(1, {{2,1},{3,1000}});
     g.insertw(2, {{3,1000}});
@@ -258,7 +258,7 @@ TEST(graph_test, FordFlukersonDegenerate) {
 //====================================================================
 TEST(graph_test, Articulate) {
     {
-        Graph g;
+        Graph g(5);
         g.insert(0, {1,2,3});
         g.insert(1, {0,2});
         g.insert(2, {0,1});
@@ -269,7 +269,7 @@ TEST(graph_test, Articulate) {
     }
 
     {
-        Graph g;
+        Graph g(4);
         g.insert(0, {1});
         g.insert(1, {0,2});
         g.insert(2, {1,3});
@@ -279,7 +279,7 @@ TEST(graph_test, Articulate) {
     }
 
     {
-        Graph g;
+        Graph g(7);
         g.insert(0, {1,2});
         g.insert(1, {0,2,3,4,6});
         g.insert(2, {0,1});
@@ -294,7 +294,7 @@ TEST(graph_test, Articulate) {
 //====================================================================
 TEST(graph_test, Bridges) {
     {
-        Graph g;
+        Graph g(5);
         g.insert(0, {1,2,3});
         g.insert(1, {0,2});
         g.insert(2, {0,1});
@@ -305,7 +305,7 @@ TEST(graph_test, Bridges) {
     }
 
     {
-        Graph g;
+        Graph g(4);
         g.insert(0, {1});
         g.insert(1, {0,2});
         g.insert(2, {1,3});
@@ -315,7 +315,7 @@ TEST(graph_test, Bridges) {
     }
 
     {
-        Graph g;
+        Graph g(7);
         g.insert(0, {1,2});
         g.insert(1, {0,2,3,4,6});
         g.insert(2, {0,1});
