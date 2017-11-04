@@ -13,4 +13,5 @@ INPUT(
 ./obj\substring.o
 ./obj\05_fib_heap.o
 ./obj\leak.o
+./obj\06_strings.o
 );
