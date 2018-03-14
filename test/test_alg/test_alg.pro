@@ -25,7 +25,8 @@ SOURCES += \
     ../../src/math/matalg.cpp \
     ../../src/math/substring.cpp \
     tests/05_fib_heap.cpp \
-    ../../src/utils/leak.cpp
+    ../../src/utils/leak.cpp \
+    tests/06_strings.cpp
 
 
 HEADERS += \

@@ -17,90 +17,65 @@ namespace bacchus {
 
 //====================================================================
 /// adjacency-list representation
-/// V:  std::set
-/// Ei: std::map<u, weight>
-/// E:  std::map<v, Ei>
 class Graph {
 public:
-    typedef std::set<int>               vlist_type;
-    typedef std::map<int,int>           adj_type;
-    typedef std::map<int, adj_type>     elist_type;
+    using vlist_type = std::vector<int>;        // for list of verts
+    using edge_type = std::pair<int,int>;       // vertex, weight
+    using adj_type = std::vector<edge_type>;    // list of edges
+    using data_type = std::vector<adj_type>;    // vec of vec of pair
 
-    Graph() = default;
     Graph(const Graph&) = default;
     Graph& operator=(const Graph&) = default;
     Graph(Graph&&) = default;
     Graph& operator=(Graph&&) = default;
 
-    Graph(const vlist_type& v): m_vlist(v) {}
+    Graph(uint num): data(num) {}
 
-    uint vsize() const {
-        return m_vlist.size();
-    }
+    uint size() const { return data.size(); }
+    void resize(int n) { data.resize(n); }
 
-    const adj_type& adj(int v) const {
-        assert(m_data.count(v));
-        return m_data.at(v);
-    }
+    const adj_type& adj(int v) const { return data[v]; }
+    adj_type& adj_mut(int v) { return data[v]; }
 
-    const vlist_type& vlist() const {
-        return m_vlist;
+    void add(int v, int u, int w=1) {
+        data[v].emplace_back(u,w);
     }
 
     void insertw(int v, const adj_type& adj_list) {
-        assert(m_data.count(v)==0);
-        m_vlist.insert(v);
-        m_data[v] = adj_list;
+        data[v] = adj_list;
     }
 
     void insert(int v, const vlist_type& adj_list) {
-        assert(m_data.count(v)==0);
-        m_vlist.insert(v);
-        for (auto u: adj_list) m_data[v][u] = 1;
+        for (auto u: adj_list)
+            data[v].emplace_back(u,1);
     }
 
-    /// adds v to V and w(v,u)
-    void add(int v, int u, int w=1) {
-        addv(v);
-        adde(v,u,w);
+    int weight(int v, int u) const {
+        for (const edge_type& edge: data[v]) {
+            if (edge.first == u)
+                return edge.second;
+        }
+        assert(false); // must never get here
+        return 0;
     }
 
-    /// adds v to V
-    void addv(int v) {
-        m_vlist.insert(v);
-    }
-
-    /// adds w(v,u)
-    void adde(int v, int u, int w=1) {
-        m_data[v][u] = w;
-    }
-
-    void set(int v, int u, int w=1) {
-        assert(m_data.count(v)!=0);
-        assert(m_data[v].count(u)!=0);
-        m_data[v][u] = w;
-    }
-
-    int get(int v, int u) const {
-        assert(m_data.count(v)!=0);
-        assert(m_data.at(v).count(u)!=0);
-        return m_data.at(v).at(u);
-    }
-
-    void erase(int v) {
-        m_vlist.erase(v);
-        m_data.erase(v);
+    int& weight_mut(int v, int u) {
+        for (edge_type& edge: data[v]) {
+            if (edge.first == u)
+                return edge.second;
+        }
+        assert(false); // must never get here
+        return data[0][0].second;
     }
 
 private:
-    elist_type m_data;// v -> u,w
-    vlist_type m_vlist;// v-s
+    data_type data;
 };
 
-inline std::ostream& operator <<(std::ostream& ostr, const Graph& mat) {
-    for (auto v: mat.vlist()) {
+inline std::ostream& operator <<(std::ostream& ostr, const Graph& g) {
+    for (uint v=0; v<g.size(); ++v) {
         ostr << v << ": ";
-        for (auto u: mat.adj(v)) {
+        for (auto u: g.adj(v)) {
             ostr << u.first << "(" << u.second << ") ";
         }
         ostr<<std::endl;
@@ -120,6 +95,10 @@ void dfs(const Graph& g);// O(V + E)
 /// use of BFS and DFS
 void find_undirected_connected_components(const Graph& g); // use BFS
 std::deque<int> topological_sort(const Graph& g); // use DFS
+
+/// articulation_points, bridges
+void articulation_points(const Graph& g);
+void bridge_edges(const Graph& g);
 
 /// oriented graph
 Graph transpose(const Graph& g);
