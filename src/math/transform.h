@@ -53,13 +53,14 @@ inline mat4f projection(float coef) {
 
 inline mat4f perspective(float fov_deg, float ratio, float znear, float zfar) {
     mat4f res;
-    float f = 1.0f/std::tan(0.5f*deg2rad(fov_deg));
+    const float f = 1.0f/std::tan(0.5f*deg2rad(fov_deg));
+    const float delta = znear - zfar;
 
     res[0][0] = f/ratio;
     res[1][1] = f;
-    res[2][2] = (znear + zfar)/(znear - zfar);
+    res[2][2] = (znear + zfar)/delta;
     res[3][2] = -1.0f;
-    res[2][3] = 2.0f*znear*zfar/(znear - zfar);
+    res[2][3] = znear*zfar/delta;//2.0f*
     res[3][3] = 0.0f;
 
     return res;
