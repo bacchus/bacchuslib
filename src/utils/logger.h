@@ -8,11 +8,13 @@
 #include <android/log.h>
 #define BCC_LOG_TAG "BACCHUSLIB"
 #define LOG_INFO(...) __android_log_print(ANDROID_LOG_INFO, BCC_LOG_TAG, __VA_ARGS__)
+//#define LOG_DEBUG(...) __android_log_print(ANDROID_LOG_DEBUG, BCC_LOG_TAG, __VA_ARGS__)
 #define LOG_ERROR(...) __android_log_print(ANDROID_LOG_ERROR, BCC_LOG_TAG, __VA_ARGS__)
 
 #else // ANDROID
 #include <cstdarg>
 #include <iostream>
+#include <libgen.h>
 
 namespace bacchus {
 
@@ -42,7 +44,95 @@ inline int bcc_log_print_impl(const char* prio, const char* file, int line, cons
 #define LOGI(...)   BCC_LOG("I", __VA_ARGS__)
 #define LOGE(...)   BCC_LOG("E", __VA_ARGS__)
 
-#endif // ANDROID
+#define ALOGD(...)   LOGD(__VA_ARGS__)
+#define ALOGI(...)   LOGI(__VA_ARGS__)
+#define ALOGE(...)   LOGE(__VA_ARGS__)
+
+#endif // else ANDROID
+
+
+inline int64_t bcc_debug_gettime_ns() {
+    timespec t;
+    int ret = clock_gettime(CLOCK_MONOTONIC, &t);
+
+    if (ret)
+        return -1;
+
+    const int64_t billion = 1000000000;
+    return (int64_t)t.tv_nsec + (int64_t)t.tv_sec * billion;
+}
+
+inline void bcc_print(const char* format, ...) {
+    char buff[4096];
+    va_list args;
+    va_start(args, format);
+    vsprintf(buff, format, args);
+    //printf("%s\n", buff);
+    //ALOGD("%s", buff);
+    std::cout << buff << std::endl;
+    va_end(args);
+}
+
+__attribute__((format(printf, 5, 6))) inline void bcc_debug_print(const char* prefix,
+                                                           const char* func,
+                                                           const char* file, int line,
+                                                           const char* format, ...) {
+    char buff[4096];
+    va_list args;
+    va_start(args, format);
+    int n = sprintf(buff, "%s:%s():%s:%d:", prefix, func, basename(const_cast<char*>(file)), line);
+    vsprintf(buff + n, format, args);
+    bcc_print("%s", buff);
+    va_end(args);
+}
+
+#define bcc_debug_error(...)                                                    \
+    do {                                                                        \
+        bcc_debug_print("ERROR", __func__, __FILE__, __LINE__, __VA_ARGS__);    \
+    } while (0)
+
+#define bcc_debug_warn(...)                                                     \
+    do {                                                                        \
+        bcc_debug_print("WARNING", __func__, __FILE__, __LINE__, __VA_ARGS__);  \
+    } while (0)
+
+#define bcc_debug_log(...)                                                      \
+    do {                                                                        \
+        bcc_debug_print("LOG", __func__, __FILE__, __LINE__, __VA_ARGS__);      \
+    } while (0)
+
+#define CHECK_RES_FATAL(ret)                                                    \
+    do {                                                                        \
+        if ((ret) < 0) {                                                        \
+            bcc_debug_error("[%s]: failed with error: %s", #ret, strerror(-ret)); \
+            return ret;                                                         \
+        }                                                                       \
+    } while (0)
+
+#define CHECK_RES_WARN(ret)                                                     \
+    do {                                                                        \
+        if ((ret) < 0) {                                                        \
+            bcc_debug_warn("[%s]: failed with error: %s", #ret, strerror(-ret));  \
+        }                                                                       \
+    } while (0)
+
+#define CHECK_COND_FATAL(cond)                                                  \
+    do {                                                                        \
+        if (!(cond)) {                                                          \
+            bcc_debug_error("check [%s] failed; error: %s"                      \
+                , #cond, strerror(-errno));                                     \
+            return errno;                                                       \
+        }                                                                       \
+    } while (0)
+
+#define CHECK_COND_WARN(cond)                                                   \
+    do {                                                                        \
+        if (!(cond)) {                                                          \
+            bcc_debug_warn("check [%s] failed; error: %s"                       \
+                , #cond, strerror(-errno));                                     \
+        }                                                                       \
+    } while (0)
+
 
 #ifdef BCC_DEBUG_GLERROR
 
