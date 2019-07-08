@@ -99,14 +99,16 @@ private:
     png_infop end_info;
 };
 
-void read_png(const char* file_name, Image& dst) {
+int read_png(const char* file_name, Image& dst) {
     png_read_struct png;
     png.read(file_name, dst);
+    return 0;
 }
 
-void read_png_mirrored(const char* file_name, Image& dst) {
+int read_png_mirrored(const char* file_name, Image& dst) {
     png_read_struct png;
     png.read(file_name, dst, true);
+    return 0;
 }
 
 static void makepng_warning(png_structp png_ptr, png_const_charp message) {
@@ -232,14 +234,16 @@ private:
     png_infop info_ptr;
 };
 
-void write_png(const char* file_name, const Image& src) {
+int write_png(const char* file_name, const Image& src) {
     png_write_struct png;
     png.write(file_name, src);
+    return 0;
 }
 
-void write_png_mirrored(const char* file_name, const Image& src) {
+int write_png_mirrored(const char* file_name, const Image& src) {
     png_write_struct png;
     png.write(file_name, src, true);
+    return 0;
 }
 
 } // namespace bacchus
