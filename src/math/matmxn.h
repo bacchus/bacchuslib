@@ -5,6 +5,7 @@
 #include <cstdlib>
 
 #include <algorithm>
+#include <numeric>
 #include <iostream>
 #include <iomanip>
 #include <set>
