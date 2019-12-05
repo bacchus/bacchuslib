@@ -8,6 +8,9 @@
 
 namespace bacchus {
 
+inline int stride(int x, int a) { return (x + (a-1)) & (~(a-1)); }
+// img_stride = stride(w, 64);
+
 struct Image {
     // bin, gray, rgb, int
     enum Format {
@@ -226,5 +229,25 @@ struct Image {
 //        return sum/255.f;
     }
 };
+
+inline int read_raw(const char* file_name, uint8_t* buff, int w, int h) {
+    FILE* fp = fopen(file_name, "rb");
+    if (fp == nullptr) {
+        LOGE("Fail open file: %s\n", file_name);
+        return -1;
+    }
+
+    // obtain file size
+    fseek(fp, 0, SEEK_END);
+    long sz = ftell(fp);
+    rewind(fp);
+
+    // read buffer
+    fread(buff, 1, sz, fp);
+
+    // terminate
+    fclose(fp);
+    return 0;
+}
 
 } // namespace bacchus

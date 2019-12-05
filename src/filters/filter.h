@@ -8,7 +8,7 @@ namespace bacchus {
 
 class Program;
 class Texture;
-class FrameBufferTexture;
+class FrameBuffer;
 
 //static const char* gDefVertSrc =
 //        "attribute vec4 posAttr;\n"
@@ -50,7 +50,7 @@ public:
     virtual void addTexture(const std::string& name, Texture* tex);
 
     virtual void setInput(Texture* inTex);
-    virtual void setOutput(FrameBufferTexture* outFbt);
+    virtual void setOutput(FrameBuffer* outFbt);
 
     void setChanged() { mChanged = true; }
     void setRatio(float new_ratio); // w/h

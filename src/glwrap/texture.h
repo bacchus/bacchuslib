@@ -27,9 +27,9 @@ public:
         CHECK_GL_ERROR(glBindTexture(GL_TEXTURE_2D, texture_id));
     }
 
-    static void unbind() {
-        CHECK_GL_ERROR(glBindTexture(GL_TEXTURE_2D, 0));
-    }
+    //    static void unbind() {
+    //        CHECK_GL_ERROR(glBindTexture(GL_TEXTURE_2D, 0));
+    //    }
 
     Texture() {}
 
@@ -45,7 +45,7 @@ public:
         , m_pixels(pixels)
     {}
 
-    ~Texture() {}
+    virtual ~Texture() {}
 
     void createGl() {
         CHECK_GL_ERROR(glGenTextures(1, &id));
@@ -53,8 +53,12 @@ public:
         //set_filter_wrap();
     }
 
-    void bind() {
+    virtual void bind() {
         CHECK_GL_ERROR(glBindTexture(GL_TEXTURE_2D, id));
+    }
+
+    virtual void unbind() {
+        CHECK_GL_ERROR(glBindTexture(GL_TEXTURE_2D, 0));
     }
 
     void filter(int minMode = NEAREST, int maxMode = NEAREST) {
@@ -86,7 +90,7 @@ public:
         pixels();
     }
 
-    void pixels() {
+    virtual void pixels() {
         bind();
         CHECK_GL_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, m_format, GL_UNSIGNED_BYTE, m_pixels));
         if (mipmap()) {
@@ -130,7 +134,7 @@ protected:
         CHECK_GL_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, m_wrap_t));
     }
 
-private:
+protected:
     uint id = 0;
     uint m_width = 0;
     uint m_height = 0;
@@ -144,6 +148,40 @@ private:
 
     friend inline uint getId(const Texture& tex);
 };
+
+#ifdef ANDROID
+class TextureOES: public Texture {
+public:
+    TextureOES(uint w, uint h, sp<GraphicBuffer> buff, EGLDisplay in_dpy)
+        : Texture(w, h, nullptr)
+        , dpy(in_dpy)
+    {
+        EGLClientBuffer clientBuffer = (EGLClientBuffer)buff->getNativeBuffer();
+        img = eglCreateImageKHR(dpy, EGL_NO_CONTEXT, EGL_NATIVE_BUFFER_ANDROID, clientBuffer, 0);
+        if (img == EGL_NO_IMAGE_KHR) {
+            LOGE("Fail eglCreateImageKHR");
+        }
+    }
+
+    virtual void bind() {
+        CHECK_GL_ERROR(glBindTexture(GL_TEXTURE_EXTERNAL_OES, id));
+    }
+
+    virtual void unbind() {
+        CHECK_GL_ERROR(glBindTexture(GL_TEXTURE_EXTERNAL_OES, 0));
+    }
+
+    virtual void pixels() {
+        bind();
+        CHECK_GL_ERROR(glEGLImageTargetTexture2DOES(GL_TEXTURE_EXTERNAL_OES, (GLeglImageOES)img));
+        unbind();
+    }
+
+private:
+    EGLImageKHR img;
+    EGLDisplay dpy;
+};
+#endif // ANDROID
 
 inline uint getId(const Texture& tex) {
     return tex.id;

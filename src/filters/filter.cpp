@@ -71,7 +71,7 @@ void Filter::setInput(Texture* inTex) {
     pass_0->add_texture("img", inTex);
 }
 
-void Filter::setOutput(FrameBufferTexture* outFbt) {
+void Filter::setOutput(FrameBuffer* outFbt) {
     pass_0->set_out(outFbt);
 }
 

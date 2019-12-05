@@ -9,11 +9,11 @@ namespace bacchus {
 class FrameBuffer {
 public:
 
-    static void bind(int glid) {
+    virtual void bind(int glid) {
         CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, glid));
     }
 
-    static void unbind() {
+    virtual void unbind() {
         CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 0));
     }
 
@@ -31,11 +31,15 @@ public:
         : id(glid)
     {}
 
-    ~FrameBuffer()
+    virtual ~FrameBuffer()
     {}
 
-    void createGl() {
+    virtual void createGl() {
         CHECK_GL_ERROR(glGenFramebuffers(1, &id));
+    }
+
+    virtual Texture* out() {
+        return nullptr;
     }
 
     void bind() {
@@ -51,8 +55,8 @@ public:
         //CHECK_GL_ERROR(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex.id, 0));
     }
 
-    uint width() const { return m_width; }
-    uint height() const { return m_height; }
+    virtual uint width() const { return m_width; }
+    virtual uint height() const { return m_height; }
 
 private:
     uint id;
@@ -95,12 +99,54 @@ public:
         return fb_tex;
     }
 
-    uint width() { return fb_tex->width(); }
-    uint height() { return fb_tex->height(); }
+    uint width() const { return fb_tex->width(); }
+    uint height() const { return fb_tex->height(); }
 
 private:
     Texture* fb_tex;
 };
+
+#ifdef ANDROID
+class FrameBufferTextureOES: public FrameBuffer {
+public:
+    FrameBufferTextureOES(uint w, uint h, sp<GraphicBuffer> in_buff, EGLDisplay in_dpy) {
+        fb_tex = new TextureOES(w, h, in_buff, in_dpy);
+    }
+
+    FrameBufferTextureOES(uint glid, Texture* tex)
+        : FrameBuffer(glid)
+        , fb_tex(tex)
+    {
+    }
+
+    ~FrameBufferTextureOES() {
+        if (fb_tex)
+            delete fb_tex;
+    }
+
+    void createGl() {
+        fb_tex->createGl();
+        //fb_tex->filter(Texture::LINEAR, Texture::LINEAR);
+        fb_tex->bind();
+        fb_tex->pixels();
+        FrameBuffer::createGl();
+        bind();
+        attach(fb_tex);
+        unbind();
+        fb_tex->unbind();
+    }
+
+    Texture* out() {
+        return fb_tex;
+    }
+
+    uint width() const { return fb_tex->width(); }
+    uint height() const { return fb_tex->height(); }
+
+private:
+    Texture* fb_tex;
+};
+#endif // ANDROID
 
 inline uint getId(const FrameBuffer& fb) {
     return fb.id;

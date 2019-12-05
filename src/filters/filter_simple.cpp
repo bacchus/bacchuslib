@@ -14,6 +14,7 @@ static std::string vertSrc =
 
 //"uniform float data;n\"data*
 static std::string fragSrc =
+        "precision mediump float;\n"
         "varying vec2 tex;\n"
         "uniform sampler2D img;\n"
         "void main() {\n"

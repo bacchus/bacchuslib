@@ -27,7 +27,7 @@ public:
         CHECK_GL_ERROR(glAttachShader(pid, id));
     }
 
-    void createGl() {
+    int createGl() {
         id = glCreateShader(m_type);
         CHECK_GL_ERROR();
         const char* c_str = m_source.c_str();
@@ -49,8 +49,10 @@ public:
                 delete[] info_log;
             }
             CHECK_GL_ERROR(glDeleteShader(id));
-            throw ShaderError("Shader compile error");
+            LOGE("Shader compile error");
+            return -1;
         }
+        return 0;
     }
 
     void destroyGl() {

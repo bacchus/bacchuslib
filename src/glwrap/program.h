@@ -29,7 +29,7 @@ public:
         //glAttachShader(id, shader->id());
     }
 
-    void createGl() {
+    int createGl() {
         m_vert->createGl();
         m_frag->createGl();
         CHECK_GL_ERROR(id = glCreateProgram());
@@ -48,8 +48,10 @@ public:
                 delete[] info_log;
             }
             CHECK_GL_ERROR(glDeleteProgram(id));
-            throw ShaderError("Shader link error");
+            LOGE("Shader link error");
+            return -1;
         }
+        return 0;
     }
 
     Attribute* attribute(const std::string& name) {
@@ -163,7 +165,7 @@ public:
         if (m_out) m_out->unbind();
     }
 
-    void set_out(FrameBufferTexture* fbt) {
+    void set_out(FrameBuffer* fbt) {
         m_out = fbt;
     }
 
@@ -181,7 +183,7 @@ private:
     int id;
     Shader* m_vert;
     Shader* m_frag;
-    FrameBufferTexture* m_out;
+    FrameBuffer* m_out;
     GLenum m_mode;
     int m_vertex_count;
     int m_width, m_height;
