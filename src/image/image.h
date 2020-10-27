@@ -6,6 +6,8 @@
 #include "math/vec2.h"
 #include "math/vec4.h"
 
+#include "utils/logger.h"
+
 namespace bacchus {
 
 inline int stride(int x, int a) { return (x + (a-1)) & (~(a-1)); }
@@ -231,6 +233,7 @@ struct Image {
 };
 
 inline int read_raw(const char* file_name, uint8_t* buff, int w, int h) {
+    (void)w; (void)h;
     FILE* fp = fopen(file_name, "rb");
     if (fp == nullptr) {
         LOGE("Fail open file: %s\n", file_name);
